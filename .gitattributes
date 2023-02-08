@@ -1,0 +1,5 @@
+/sbt linguist-detectable=false
+/sbt.bat linguist-detectable=false
+sbt-dist/bin/sbt-launch-lib.bash linguist-detectable=false
+sbt-dist/bin/sbt linguist-detectable=false
+sbt-dist/bin/sbt.bat linguist-detectable=false
