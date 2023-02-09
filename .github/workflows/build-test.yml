@@ -3,7 +3,8 @@ name: Check
 on:
   push:
     branches:
-      - main
+      - master
+      - dev
     tags: ["*"]
   pull_request:
 
