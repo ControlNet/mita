@@ -11,4 +11,9 @@ class HomeController @Inject() (cc: ControllerComponents) extends AbstractContro
   def appSummary: Action[AnyContent] = Action {
     Ok(Json.obj("content" -> "Scala Play React Seed!"))
   }
+
+  def echo: Action[AnyContent] = Action { request =>
+    println(request)
+    Ok(Json.obj("content" -> "Echo!"))
+  }
 }

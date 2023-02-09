@@ -7,4 +7,5 @@ target
 /.settings
 /RUNNING_PID
 /public
+/data
 .bsp
