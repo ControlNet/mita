@@ -36,15 +36,16 @@ object FileSync {
     }
   }
 
-  def load(): Unit = {
-    savePath.toFile.listFiles().filter(_.getName.endsWith(".json")).foreach(file => {
+  def load(): Unit = savePath.toFile
+    .listFiles()
+    .filter(_.getName.endsWith(".json"))
+    .foreach(file => {
       val view = View(file.getName.replace(".json", ""))
-      Using(Source.fromFile(file)) {
-        source => view.loadFromJson(source.mkString)
+      Using(Source.fromFile(file)) { source =>
+        view.loadFromJson(source.mkString)
       }
       Memory.views.update(view.name, view)
     })
-  }
 
   def stop(): Unit = needStop = true
 }

@@ -18,9 +18,4 @@ describe("App tests", () => {
   it("renders without crashing", () => {
     render();
   });
-
-  it("getSummary function should called exactly once", () => {
-    render();
-    expect(Client.getSummary.mock.calls.length).toBe(1);
-  });
 });

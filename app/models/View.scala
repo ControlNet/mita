@@ -16,7 +16,9 @@ case class View(name: String) {
 
   def loadFromJson(json: String): Unit = updateFromJson(Json.parse(json))
 
-  def updateFromJson(json: JsValue): Unit = json.as[JsArray].value
+  def updateFromJson(json: JsValue): Unit = json
+    .as[JsArray]
+    .value
     .map(Component.importFromJson)
     .foreach(updateComponent)
 }

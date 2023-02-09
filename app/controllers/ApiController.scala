@@ -9,7 +9,8 @@ import utils.Auth
 import javax.inject._
 
 @Singleton
-class ApiController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
+class ApiController @Inject() (cc: ControllerComponents)
+    extends AbstractController(cc) {
 
   def push: Action[AnyContent] = Action { request =>
     try {
@@ -27,8 +28,7 @@ class ApiController @Inject()(cc: ControllerComponents) extends AbstractControll
         view.updateFromJson(data)
         Memory.needSave = true
         Ok
-      }
-      else Unauthorized
+      } else Unauthorized
     } catch {
       case e: Throwable => e.printStackTrace(); BadRequest
     }
@@ -42,7 +42,7 @@ class ApiController @Inject()(cc: ControllerComponents) extends AbstractControll
   def view(name: String): Action[AnyContent] = Action {
     Memory.views.get(name) match {
       case Some(value) => Ok(value.exportJson)
-      case None => BadRequest
+      case None        => BadRequest
     }
   }
 
