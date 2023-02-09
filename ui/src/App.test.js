@@ -3,7 +3,6 @@ import { createRoot } from "react-dom/client";
 import { act } from "react-dom/test-utils";
 
 import App from "./App";
-import Client from "./Client";
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -14,8 +13,6 @@ const render = () => {
     root.render(<App />);
   });
 };
-
-jest.mock("../src/Client");
 
 describe("App tests", () => {
   it("renders without crashing", () => {

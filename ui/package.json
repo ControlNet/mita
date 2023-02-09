@@ -9,11 +9,13 @@
   },
   "private": true,
   "dependencies": {
+    "daisyui": "^2.50.0",
     "kleur": "^4.1.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "tailwindcss": "^3.2.6"
   },
   "devDependencies": {
     "ncp": "^2.0.0",

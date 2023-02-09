@@ -11,7 +11,7 @@ import play.api.test.Helpers._
   * For more information, see
   * https://www.playframework.com/documentation/latest/ScalaTestingWithScalaTest
   */
-class HomeControllerSpec
+class ApiControllerSpec
     extends PlaySpec
     with GuiceOneAppPerTest
     with Injecting {
@@ -19,7 +19,7 @@ class HomeControllerSpec
   "HomeController GET" should {
 
     "render the appSummary resource from a new instance of controller" in {
-      val controller = new HomeController(stubControllerComponents())
+      val controller = new ApiController(stubControllerComponents())
       val home = controller.appSummary().apply(FakeRequest(GET, "/summary"))
 
       status(home) mustBe OK
@@ -29,7 +29,7 @@ class HomeControllerSpec
     }
 
     "render the appSummary resource from the application" in {
-      val controller = inject[HomeController]
+      val controller = inject[ApiController]
       val home = controller.appSummary().apply(FakeRequest(GET, "/summary"))
 
       status(home) mustBe OK

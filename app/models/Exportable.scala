@@ -14,7 +14,7 @@ object Exportable {
   private def exportJson[T](value: T)(implicit exportable: Exportable[T]): String = exportable.exportJson(value)
 
   implicit class ExportableOps[T](a: T) {
-    def exportJsObject()(implicit exportable: Exportable[T]): JsValue = Exportable.exportJsObject[T](a)
+    def exportJsObject(implicit exportable: Exportable[T]): JsValue = Exportable.exportJsObject[T](a)
 
     def exportJson(implicit exportable: Exportable[T]): String = Exportable.exportJson[T](a)
   }
