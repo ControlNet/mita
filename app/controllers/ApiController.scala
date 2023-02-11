@@ -46,11 +46,23 @@ class ApiController @Inject() (cc: ControllerComponents)
     }
   }
 
-  def delete(name: String, pw: String): Action[AnyContent] = Action {
+  def deleteView(viewName: String, pw: String): Action[AnyContent] = Action {
     if (Auth.string(pw)) {
-      Memory.views.remove(name)
+      Memory.views.remove(viewName)
       Memory.needSave = true
       Ok
+    } else Unauthorized
+  }
+
+  def deleteComponent(viewName: String, componentName: String, pw: String): Action[AnyContent] = Action {
+    if (Auth.string(pw)) {
+      Memory.views.get(viewName) match {
+        case Some(value) =>
+          value.components.remove(componentName)
+          Memory.needSave = true
+          Ok
+        case None => BadRequest
+      }
     } else Unauthorized
   }
 

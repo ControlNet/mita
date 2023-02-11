@@ -1,0 +1,2 @@
+class MitaAuthError(Exception):
+    pass

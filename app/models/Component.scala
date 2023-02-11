@@ -64,8 +64,8 @@ object Component {
               )
             })
             .toList,
-          obj("xLabel").as[JsString].value,
-          obj("yLabel").as[JsString].value
+          obj("x_label").as[JsString].value,
+          obj("y_label").as[JsString].value
         )
       case _ => throw new Exception("Unknown type")
     }

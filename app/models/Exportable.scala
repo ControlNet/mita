@@ -77,8 +77,8 @@ object Exportable {
           "label" -> datum.label
         )
       ),
-      "xLabel" -> value.xLabel,
-      "yLabel" -> value.yLabel
+      "x_label" -> value.xLabel,
+      "y_label" -> value.yLabel
     )
 
   implicit val memoryExportable: Exportable[View] = value => {
