@@ -13,3 +13,9 @@ html {
 [data-theme="cupcake"] .btn-square {
   --rounded-btn: 0.5rem !important;
 }
+
+@layer components {
+  .rounded-corners {
+    @apply rounded-2xl border-collapse overflow-hidden;
+  }
+}

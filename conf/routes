@@ -11,7 +11,8 @@ POST    /api/push                   controllers.ApiController.push
 GET     /api/listViews              controllers.ApiController.listViews(pw: String ?= "")
 GET     /api/views/:name            controllers.ApiController.view(name: String)
 GET     /api/auth                   controllers.ApiController.auth(pw: String ?= "")
-DELETE  /api/delete/:name           controllers.ApiController.delete(name: String, pw: String ?= "")
+DELETE  /api/delete/:viewName       controllers.ApiController.deleteView(viewName: String, pw: String ?= "")
+DELETE  /api/delete/:viewName/:componentName controllers.ApiController.deleteComponent(viewName: String, componentName: String, pw: String ?= "")
 
 # Serve static assets under public directory
 GET     /*file                      controllers.FrontendController.assetOrDefault(file)

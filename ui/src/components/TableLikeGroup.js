@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 
 export default function TableLikeGroup(props) {
   return (
-    <Table className={props.className + " w-full"} compact={true} zebra={true}>
+    <Table className={props.className + " w-full rounded-corners"} compact={true} zebra={true}>
       <Table.Head>
         <span>Name</span>
         <span>Value</span>
