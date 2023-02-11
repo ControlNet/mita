@@ -54,7 +54,8 @@ class ApiController @Inject() (cc: ControllerComponents)
     } else Unauthorized
   }
 
-  def auth: Action[AnyContent] = Action {
-    Ok
+  def auth(pw: String): Action[AnyContent] = Action {
+    if (Auth.string(pw)) Ok
+    else Unauthorized
   }
 }

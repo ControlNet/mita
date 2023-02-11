@@ -1,24 +1,65 @@
-import { Component } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getView } from "../utils/api";
+import _ from "lodash";
+import TableLikeGroup from "./TableLikeGroup";
+import LoggerGroup from "./LoggerGroup";
+import { useSelector } from "react-redux";
 
-export default class View extends Component {
-  constructor(props) {
-    super(props);
+export default function View(props) {
+  const [groups, setGroups] = useState({});
+  const interval = useSelector((state) => state.updateInterval.value);
 
-    this.state = { view: {} };
-  }
+  useEffect(() => {
+    getView(props.viewName)
+      .then((view) => _.groupBy(view, (d) => d.cls))
+      .then(setGroups);
+  }, [props.viewName]);
 
-  async componentDidMount() {
-    const view = await getView(this.props.viewName);
-    this.setState({ view });
-  }
+  useEffect(() => {
+    const intervalTask = setInterval(() => {
+      getView(props.viewName)
+        .then((view) => _.groupBy(view, (d) => d.cls))
+        .then(setGroups);
+    }, interval);
+    return () => clearInterval(intervalTask);
+  }, [interval, props.viewName]);
 
-  render() {
-    return (
-      <div className={"m-2"}>
-        <h1>{this.props.viewName}</h1>
-        <p>{JSON.stringify(this.state.view)}</p>
-      </div>
-    );
-  }
+  const variableGroup = useMemo(
+    () => ("Variable" in groups ? groups["Variable"] : []),
+    [groups]
+  );
+  const progressBarGroup = useMemo(
+    () => ("ProgressBar" in groups ? groups["ProgressBar"] : []),
+    [groups]
+  );
+  const needRenderTableLikeGroup = useMemo(
+    () => variableGroup.length > 0 || progressBarGroup.length > 0,
+    [variableGroup, progressBarGroup]
+  );
+
+  const needRenderLogGroup = useMemo(() => "Logger" in groups, [groups]);
+
+  return (
+    <div className={"m-2"}>
+      <h1 className="text-2xl font-bold mb-5">{props.viewName}</h1>
+      {needRenderTableLikeGroup ? (
+        <TableLikeGroup
+          variableGroup={variableGroup}
+          progressBarGroup={progressBarGroup}
+          key={`${props.viewName}::TableLikeGroup`}
+          parent={`${props.viewName}::TableLikeGroup`}
+        />
+      ) : undefined}
+
+      {needRenderLogGroup ? (
+        <LoggerGroup
+          data={groups["Logger"]}
+          parent={`${props.viewName}::Logger`}
+          className="py-2"
+        />
+      ) : undefined}
+
+      {/*{TODO: Image and LineChart}*/}
+    </div>
+  );
 }
