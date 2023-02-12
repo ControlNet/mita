@@ -34,6 +34,7 @@ jobs:
   unittest:
     name: Unittest
     runs-on: ubuntu-20.04
+    needs: ["build-test"]
 
     strategy:
       fail-fast: false

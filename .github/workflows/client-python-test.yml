@@ -37,6 +37,7 @@ jobs:
   import-test:
     name: Import Test
     runs-on: ubuntu-20.04
+    needs: ["build-test"]
 
     strategy:
       fail-fast: false
@@ -68,6 +69,7 @@ jobs:
   unittest:
     name: Unittest
     runs-on: ubuntu-20.04
+    needs: ["import-test"]
 
     strategy:
       fail-fast: false
