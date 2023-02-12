@@ -1,6 +1,6 @@
 import unittest
 
-import mita
+import mita_client
 
 
 class TestLibraryInfo(unittest.TestCase):
@@ -9,7 +9,7 @@ class TestLibraryInfo(unittest.TestCase):
         with open("version.txt", "r") as f:
             version = f.read()
 
-        self.assertEqual(mita.__version__, version)
+        self.assertEqual(mita_client.__version__, version)
 
 
 if __name__ == '__main__':

@@ -258,4 +258,4 @@ Thumbs.db
 .idea
 scratch*.py
 scratch*.ipynb
-/src/mita/version.txt
+/src/mita_client/version.txt

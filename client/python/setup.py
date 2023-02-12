@@ -14,7 +14,7 @@ version = init.read_version()
 init.write_version(version)
 
 setuptools.setup(
-    name="mita",
+    name="mita_client",
     version=version,
     author="ControlNet",
     author_email="smczx@hotmail.com",
@@ -28,9 +28,9 @@ setuptools.setup(
     },
     keywords=["web"],
     package_dir={"": "src"},
-    packages=setuptools.find_packages(where="src", include=["mita", "mita.*"]),
+    packages=setuptools.find_packages(where="src", include=["mita_client", "mita_client.*"]),
     package_data={
-        "mita": [
+        "mita_client": [
             "version.txt"
         ]
     },

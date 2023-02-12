@@ -5,7 +5,7 @@ def read_version() -> str:
 
 
 def write_version(version: str) -> None:
-    with open("src/mita/version.txt", "w") as file:
+    with open("src/mita_client/version.txt", "w") as file:
         file.write(version)
 
 

@@ -63,7 +63,7 @@ jobs:
         working-directory: ./client/python
         run: |
           pip install .
-          python -c "import mita"
+          python -c "import mita_client"
 
   unittest:
     name: Unittest
