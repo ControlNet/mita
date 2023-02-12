@@ -1,17 +1,12 @@
-name: Check
+name: Test
 
 on:
   push:
-    branches:
+    branches-ignore:
       - master
-      - dev
-    tags: ["*"]
   pull_request:
-
-concurrency:
-  # Only run once for latest commit per ref and cancel other (previous) runs.
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+    branches:
+      - '*'
 
 jobs:
   check-code-style:
@@ -20,7 +15,7 @@ jobs:
     with:
       cmd: sbt validateCode
 
-  tests:
+  unittest:
     name: Tests
     needs: # Waiting more lightweight checks
       - "check-code-style"
@@ -28,8 +23,9 @@ jobs:
     with:
       cmd: sbt test
 
-  run-application:
+  integration-test:
     strategy:
+      fail-fast: false
       matrix:
         mode: [development, production]
         include:
@@ -39,20 +35,19 @@ jobs:
             port: 9000
     name: Run in ${{ matrix.mode }} mode
     needs:
-      - "tests"
+      - "unittest"
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          # we don't know what commit the last tag was it's safer to get entire repo so previousStableVersion resolves
           fetch-depth: 0
 
       - name: Build docker image
-        run: docker build -f .github/integration-test/Dockerfile-${{ matrix.mode }} -t play-scala-react-seed .
+        run: docker build -f .github/integration-test/Dockerfile-${{ matrix.mode }} -t mita .
 
       - name: Run docker image
-        run: docker run -p ${{ matrix.port }}:${{ matrix.port }} -d play-scala-react-seed
+        run: docker run -p ${{ matrix.port }}:${{ matrix.port }} -d mita
 
       - name: Setup scala-cli
         uses: VirtusLab/scala-cli-setup@v0.1.4
