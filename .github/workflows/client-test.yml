@@ -1,0 +1,15 @@
+name: Client Test
+
+on:
+  push:
+    branches-ignore:
+      - master
+  pull_request:
+    branches:
+      - '*'
+
+
+jobs:
+  client-python-test:
+    name: Python Client Test
+    uses: ./.github/workflows/client-python-test.yml
