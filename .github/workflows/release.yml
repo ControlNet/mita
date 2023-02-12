@@ -1,0 +1,14 @@
+name: Release
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  client-python-release:
+    name: Python Client Release
+    uses: ./.github/workflows/client-python-release.yml
+
+  client-js-release:
+    name: JS Client Release
+    uses: ./.github/workflows/client-js-release.yml

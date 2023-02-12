@@ -8,7 +8,6 @@ on:
     branches:
       - '*'
 
-
 jobs:
   client-python-test:
     name: Python Client Test
