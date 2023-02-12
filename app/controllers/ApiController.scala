@@ -54,7 +54,11 @@ class ApiController @Inject() (cc: ControllerComponents)
     } else Unauthorized
   }
 
-  def deleteComponent(viewName: String, componentName: String, pw: String): Action[AnyContent] = Action {
+  def deleteComponent(
+      viewName: String,
+      componentName: String,
+      pw: String
+  ): Action[AnyContent] = Action {
     if (Auth.string(pw)) {
       Memory.views.get(viewName) match {
         case Some(value) =>

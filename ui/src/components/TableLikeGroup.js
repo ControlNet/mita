@@ -5,7 +5,11 @@ import { useSelector } from "react-redux";
 
 export default function TableLikeGroup(props) {
   return (
-    <Table className={props.className + " w-full rounded-corners"} compact={true} zebra={true}>
+    <Table
+      className={props.className + " w-full rounded-corners"}
+      compact={true}
+      zebra={true}
+    >
       <Table.Head>
         <span>Name</span>
         <span>Value</span>
@@ -47,7 +51,7 @@ function VariableTableRow(props) {
 
 function ProgressBarTableRow(props) {
   const [color, setColor] = useState("progress-warning");
-  const [value, setValue] = useState(props.d.value);
+  const value = useState(props.d.value)[0];
 
   const prevValue = useRef(value);
   const [timer, setTimer] = useState(0);
@@ -68,21 +72,6 @@ function ProgressBarTableRow(props) {
       prevValue.current = value;
     }
   }, [timer, value, updateInterval]);
-
-  // DEBUG only
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (Math.random() > 0.5) {
-        setValue(value + 1);
-      } else if (Math.random() > 0.1) {
-        setValue(value - 1);
-      } else {
-        setValue(value);
-      }
-      setTimer(timer + 1);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [timer]);
 
   return (
     <Table.Row key={props.parent + "::" + props.d.name} hover={true}>
