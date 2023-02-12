@@ -26,7 +26,7 @@ setuptools.setup(
         "Bug Tracker": "https://github.com/ControlNet/mita/issues",
         "Source Code": "https://github.com/ControlNet/mita",
     },
-    keywords=["web"],
+    keywords=["monitoring", "logging"],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src", include=["mita_client", "mita_client.*"]),
     package_data={
