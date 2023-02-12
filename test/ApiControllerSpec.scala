@@ -16,36 +16,22 @@ class ApiControllerSpec
     with GuiceOneAppPerTest
     with Injecting {
 
-  "HomeController GET" should {
+  "ApiController GET" should {
 
-    "render the appSummary resource from a new instance of controller" in {
+    "auth return OK with correct password" in {
       val controller = new ApiController(stubControllerComponents())
-      val home = controller.appSummary().apply(FakeRequest(GET, "/summary"))
+      val pw = sys.env.getOrElse("MITA_PASSWORD", "password")
+      val response = controller.auth(pw)(FakeRequest(GET, s"/api/auth?pw=$pw"))
 
-      status(home) mustBe OK
-      contentType(home) mustBe Some("application/json")
-      val resultJson = contentAsJson(home)
-      resultJson.toString() mustBe """{"content":"Scala Play React Seed!"}"""
+      status(response) mustBe OK
     }
 
-    "render the appSummary resource from the application" in {
-      val controller = inject[ApiController]
-      val home = controller.appSummary().apply(FakeRequest(GET, "/summary"))
+    "auth return Unauthorized with incorrect password" in {
+      val controller = new ApiController(stubControllerComponents())
+      val pw = sys.env.getOrElse("MITA_PASSWORD", "password") + "1"
+      val response = controller.auth(pw)(FakeRequest(GET, s"/api/auth?pw=$pw"))
 
-      status(home) mustBe OK
-      contentType(home) mustBe Some("application/json")
-      val resultJson = contentAsJson(home)
-      resultJson.toString() mustBe """{"content":"Scala Play React Seed!"}"""
-    }
-
-    "render the appSummary resource from the router" in {
-      val request = FakeRequest(GET, "/api/summary")
-      val home = route(app, request).get
-
-      status(home) mustBe OK
-      contentType(home) mustBe Some("application/json")
-      val resultJson = contentAsJson(home)
-      resultJson.toString() mustBe """{"content":"Scala Play React Seed!"}"""
+      status(response) mustBe UNAUTHORIZED
     }
   }
 }
