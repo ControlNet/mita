@@ -1,3 +1,4 @@
+import init
 import setuptools
 
 with open("../../README.md", "r", encoding="UTF-8") as file:
@@ -9,24 +10,8 @@ with open("requirements.txt", "r", encoding="UTF-8") as file:
         requirements.append(line.strip())
 
 
-def read_version() -> str:
-    with open("version.txt", "r") as f:
-        ver = f.read()
-    return ver
-
-
-def write_version(ver: str) -> None:
-    with open("src/mita/version.txt", "w") as f:
-        f.write(ver)
-
-
-def init_version() -> None:
-    ver = read_version()
-    write_version(ver)
-
-
-version = read_version()
-write_version(version)
+version = init.read_version()
+init.write_version(version)
 
 setuptools.setup(
     name="mita",
