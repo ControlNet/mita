@@ -13,7 +13,6 @@ resolvers += "Atlassian Releases" at "https://maven.atlassian.com/public/"
 
 scalaVersion := "2.13.10"
 
-
 libraryDependencies += guice
 libraryDependencies += "net.codingwell" %% "scala-guice" % "5.1.0"
 libraryDependencies += "io.github.honeycomb-cheesecake" %% "play-silhouette" % "8.0.2"
