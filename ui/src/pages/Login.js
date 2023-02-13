@@ -2,7 +2,6 @@ import { useState } from "react";
 import * as api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { Button, Form, Hero, Input, InputGroup } from "react-daisyui";
-import { TOKEN_KEY } from "../utils/global";
 
 export default function Login(props) {
   const [input, setInput] = useState("");

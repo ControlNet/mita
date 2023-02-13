@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getViewList } from "../utils/api";
 import View from "./View";
 import { Button, Divider, Range } from "react-daisyui";
@@ -43,24 +43,24 @@ export default function Mita(props) {
     }
   };
 
-  function fetchViewList() {
+  const fetchViewList = useCallback(() => {
     getViewList()
       .then(setViewNames)
       .catch(() => {
         navigate("/login");
       });
-  }
+  }, [navigate]);
 
   useEffect(() => {
     fetchViewList();
-  }, []);
+  }, [fetchViewList]);
 
   useEffect(() => {
     const intervalTask = setInterval(() => {
       fetchViewList();
     }, interval);
     return () => clearInterval(intervalTask);
-  }, [interval]);
+  }, [interval, fetchViewList]);
 
   function onIntervalChange(e) {
     dispatch(setUpdateInterval(rangeLevelToInterval(Number(e.target.value))));
