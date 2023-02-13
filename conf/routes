@@ -10,6 +10,7 @@ GET     /                           controllers.FrontendController.index
 POST    /api/push                   controllers.ApiController.push
 GET     /api/listViews              controllers.ApiController.listViews
 GET     /api/views/:name            controllers.ApiController.view(name: String)
++nocsrf
 POST    /api/auth                   controllers.ApiController.auth
 GET     /api/testAuth               controllers.ApiController.testAuth
 DELETE  /api/delete/:viewName       controllers.ApiController.deleteView(viewName: String)
