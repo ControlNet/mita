@@ -13,7 +13,8 @@ resolvers += "Atlassian Releases" at "https://maven.atlassian.com/public/"
 
 scalaVersion := "2.13.10"
 scalacOptions ++= Seq(
-  "-encoding", "UTF-8"
+  "-encoding",
+  "UTF-8"
 )
 javaOptions += "-Dfile.encoding=UTF-8"
 
