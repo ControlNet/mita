@@ -62,7 +62,6 @@ function ProgressBarTableRow(props) {
     const prev = prevValue.current;
     if (timer >= (2 * updateInterval) / 1000) {
       setTimer(0);
-      console.log(value, prev)
       if (value > prev) {
         setColor("progress-success");
       } else if (value < prev) {
