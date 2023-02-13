@@ -60,7 +60,7 @@ function ProgressBarTableRow(props) {
   // for same time interval, change color based on value change
   useEffect(() => {
     const prev = prevValue.current;
-    if (timer >= (2 * updateInterval) / 1000) {
+    if (timer >= (4 * updateInterval) / 1000) {
       setTimer(0);
       if (value > prev) {
         setColor("progress-success");
@@ -74,11 +74,11 @@ function ProgressBarTableRow(props) {
   }, [timer, value, updateInterval]);
 
   useEffect(() => {
-      const interval = setInterval(() => {
-          setTimer(timer + 1)
-      }, 1000)
-      return () => clearInterval(interval)
-  }, [timer])
+    const interval = setInterval(() => {
+      setTimer(timer + 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timer]);
 
   return (
     <Table.Row key={props.parent + "::" + props.d.name} hover={true}>

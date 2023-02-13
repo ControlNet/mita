@@ -1,7 +1,13 @@
 import { Hero } from "react-daisyui";
 import ThemeButton from "../components/ThemeButton";
+import { useEffect } from "react";
+import { themeChange } from "theme-change";
 
 export default function NotFound(props) {
+  useEffect(() => {
+    themeChange(false);
+  }, []);
+
   return (
     <Hero {...props}>
       <Hero.Overlay className="bg-base-200">

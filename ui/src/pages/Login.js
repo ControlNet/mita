@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { Button, Form, Hero, Input, InputGroup } from "react-daisyui";
 import ThemeButton from "../components/ThemeButton";
+import { themeChange } from "theme-change";
 
 export default function Login(props) {
   const [input, setInput] = useState("");
@@ -11,6 +12,10 @@ export default function Login(props) {
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [color, setColor] = useState("primary");
   const [buttonText, setButtonText] = useState("LOGIN");
+
+  useEffect(() => {
+    themeChange(false);
+  }, []);
 
   function setButtonStage(stage) {
     switch (stage) {

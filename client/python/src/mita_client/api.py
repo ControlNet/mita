@@ -124,15 +124,18 @@ class MitaWorker:
                     continue
 
             d = self.data.get()
+            import time
+            t0 = time.time()
             state = self.push(d)
             if state == State.CONNECTION_ERROR:
-                warnings.warn(f"[Mika] Connection error!")
+                warnings.warn(f"[Mita] Connection error!")
             elif state == State.AUTH_ERROR:
                 try:
                     self.client.auth()
                 except MitaAuthError:
-                    warnings.warn(f"[Mika] Authentication error!")
+                    warnings.warn(f"[Mita] Authentication error!")
                 except URLError:
-                    warnings.warn(f"[Mika] Connection error!")
+                    warnings.warn(f"[Mita] Connection error!")
                 else:
                     self.push(d)
+            print(f"[Mita] Pushed in {time.time() - t0:.3f} sec.")
