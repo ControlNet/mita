@@ -1,5 +1,5 @@
 import { Table } from "react-daisyui";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "../stores/updateIntervalSlice";
 import { useSelector } from "react-redux";
 
@@ -51,7 +51,7 @@ function VariableTableRow(props) {
 
 function ProgressBarTableRow(props) {
   const [color, setColor] = useState("progress-warning");
-  const value = useState(props.d.value)[0];
+  const value = useMemo(() => props.d.value || 0, [props.d.value]);
 
   const prevValue = useRef(value);
   const [timer, setTimer] = useState(0);
@@ -62,6 +62,7 @@ function ProgressBarTableRow(props) {
     const prev = prevValue.current;
     if (timer >= (2 * updateInterval) / 1000) {
       setTimer(0);
+      console.log(value, prev)
       if (value > prev) {
         setColor("progress-success");
       } else if (value < prev) {
@@ -72,6 +73,13 @@ function ProgressBarTableRow(props) {
       prevValue.current = value;
     }
   }, [timer, value, updateInterval]);
+
+  useEffect(() => {
+      const interval = setInterval(() => {
+          setTimer(timer + 1)
+      }, 1000)
+      return () => clearInterval(interval)
+  }, [timer])
 
   return (
     <Table.Row key={props.parent + "::" + props.d.name} hover={true}>
