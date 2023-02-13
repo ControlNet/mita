@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 import json
 import warnings
 from enum import Enum
@@ -7,6 +10,11 @@ from threading import Thread
 from time import sleep
 from urllib import request
 from urllib.error import HTTPError, URLError
+
+from .error import MitaAuthError
+
+if TYPE_CHECKING:
+    from .client import Mita
 
 
 class State(Enum):
@@ -18,7 +26,15 @@ class State(Enum):
     CONNECTION_ERROR = 2
 
 
-# GET /api/auth?pw=password
+_token = ""
+
+
+def set_token(token: str):
+    global _token
+    _token = token
+
+
+# POST /api/auth
 def auth(url: str, password: str) -> State:
     """
     Request authentication to the server.
@@ -31,8 +47,10 @@ def auth(url: str, password: str) -> State:
         ``State``: State of response.
     """
     try:
-        with request.urlopen(f"{url}/api/auth?pw={password}") as f:
-            f.read()
+        data = str(json.dumps({"password": password})).encode("utf-8")
+        req = request.Request(f"{url}/api/auth", data=data, headers={"Content-Type": "application/json"})
+        with request.urlopen(req) as f:
+            set_token(json.loads(f.read())["token"])
         return State.SUCCESS
     except HTTPError:
         return State.AUTH_ERROR
@@ -41,20 +59,23 @@ def auth(url: str, password: str) -> State:
 
 
 # POST /api/push
-def push(url: str, password: str, data: dict) -> State:
+def push(url: str, data: dict) -> State:
     """
     Push data to the server.
 
     Args:
         url (``str``): URL of the server.
-        password (``str``): Password of the server.
         data (``dict``): Data to push.
 
+    Returns:
+        ``State``: State of response.
     """
     try:
-        data["password"] = password
         data = str(json.dumps(data)).encode("utf-8")
-        req = request.Request(f"{url}/api/push", data=data, headers={"Content-Type": "application/json"})
+        req = request.Request(f"{url}/api/push", data=data, headers={
+            "Content-Type": "application/json",
+            "X-Auth-Token": _token
+        })
         with request.urlopen(req) as f:
             f.read()
         return State.SUCCESS
@@ -66,9 +87,10 @@ def push(url: str, password: str, data: dict) -> State:
 
 class MitaWorker:
 
-    def __init__(self, url: str, password: str):
+    def __init__(self, url: str, client: Mita):
         super().__init__()
-        self.push = partial(push, url, password)
+        self.client = client
+        self.push = partial(push, url)
         self.data = Queue()  # queue of dict
         self.should_stop = False
         self.threads = []
@@ -103,10 +125,14 @@ class MitaWorker:
 
             d = self.data.get()
             state = self.push(d)
-            print("Pushed.")
             if state == State.CONNECTION_ERROR:
                 warnings.warn(f"[Mika] Connection error!")
             elif state == State.AUTH_ERROR:
-                warnings.warn(f"[Mika] Authentication error!")
-
-        print("Thread stopped.")
+                try:
+                    self.client.auth()
+                except MitaAuthError:
+                    warnings.warn(f"[Mika] Authentication error!")
+                except URLError:
+                    warnings.warn(f"[Mika] Connection error!")
+                else:
+                    self.push(d)

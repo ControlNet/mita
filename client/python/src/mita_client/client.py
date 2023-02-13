@@ -14,7 +14,7 @@ class Mita:
         self.url = url
         self.password = password
         self.views: List[View] = []
-        self.worker = MitaWorker(url, password)
+        self.worker = MitaWorker(url, self)
         self.num_workers = num_workers
 
     def __enter__(self) -> Mita:

@@ -76,7 +76,6 @@ jobs:
         run: |
           VER=$(python ./get_version.py)
           echo "VERSION=$VER" >> $GITHUB_ENV
-          
 
       - name: Release to GitHub Release
         working-directory: ./client/js

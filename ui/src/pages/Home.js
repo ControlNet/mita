@@ -7,8 +7,8 @@ export default function Home(props) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.auth().then((success) => {
-      if (!success) {
+    api.testAuth().then(response => {
+      if (response.status !== 200) {
         navigate("/login");
       }
     });

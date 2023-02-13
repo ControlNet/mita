@@ -1,9 +1,8 @@
 import akka.actor.ActorSystem
+import play.api.Logging
 import play.api.inject.ApplicationLifecycle
-import play.api.{Logger, Logging}
 import utils.FileSync
 
-import java.nio.file.Paths
 import javax.inject._
 import scala.concurrent.{Await, ExecutionContext, Future}
 

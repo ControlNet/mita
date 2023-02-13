@@ -6,11 +6,13 @@ import { setUpdateInterval } from "../stores/updateIntervalSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMoon } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 export default function Mita(props) {
   const [viewNames, setViewNames] = useState([]);
   const dispatch = useDispatch();
   const interval = useSelector((state) => state.updateInterval.value);
+  const navigate = useNavigate();
 
   const rangeLevelToInterval = (level) => {
     switch (level) {
@@ -41,13 +43,21 @@ export default function Mita(props) {
     }
   };
 
+  function fetchViewList() {
+    getViewList()
+      .then(setViewNames)
+      .catch(() => {
+        navigate("/login");
+      })
+  }
+
   useEffect(() => {
-    getViewList().then(setViewNames);
+    fetchViewList();
   }, []);
 
   useEffect(() => {
     const intervalTask = setInterval(() => {
-      getViewList().then(setViewNames);
+      fetchViewList();
     }, interval);
     return () => clearInterval(intervalTask);
   }, [interval]);

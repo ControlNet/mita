@@ -2,6 +2,7 @@ import { useState } from "react";
 import * as api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { Button, Form, Hero, Input, InputGroup } from "react-daisyui";
+import { TOKEN_KEY } from "../utils/global";
 
 export default function Login(props) {
   const [input, setInput] = useState("");
@@ -35,8 +36,9 @@ export default function Login(props) {
 
   async function onClick() {
     setButtonStage("processing");
-    api.setAuth(input);
-    if (await api.auth()) {
+    const response = await api.auth(input)
+    if (response.status === 200) {
+      api.setAuth((await response.json()).token)
       navigate("/");
     } else {
       setButtonStage("error");

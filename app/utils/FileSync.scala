@@ -1,7 +1,7 @@
 package utils
 
 import models.Exportable.ExportableOps
-import models.{Component, Memory, View}
+import models.{Memory, View}
 
 import java.nio.file.{Files, Paths}
 import scala.io.Source

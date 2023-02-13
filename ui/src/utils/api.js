@@ -1,24 +1,40 @@
-let _password =
-  window.localStorage.getItem("password") ||
-  process.env.REACT_APP_PASSWORD ||
-  "";
+import { TOKEN_KEY } from "./global";
+
+const _headers = {
+  "Content-Type": "application/json"
+}
+
+_headers[TOKEN_KEY] = window.localStorage.getItem("token") || "";
 
 export async function getViewList() {
-  const response = await fetch(`/api/listViews?pw=${_password}`);
+  const response = await fetch(`/api/listViews`, {
+    headers: _headers
+  });
   return await response.json();
 }
 
 export async function getView(name) {
-  const response = await fetch(`/api/views/${name}?pw=${_password}`);
+  const response = await fetch(`/api/views/${name}`, {
+    headers: _headers
+  });
   return await response.json();
 }
 
-export async function auth() {
-  const response = await fetch(`/api/auth?pw=${_password}`);
-  return response.status === 200;
+export function auth(password) {
+  return fetch("/api/auth", {
+    method: "POST",
+    headers: _headers,
+    body: JSON.stringify({password})
+  });
 }
 
-export function setAuth(password) {
-  _password = password;
-  window.localStorage.setItem("password", password);
+export function testAuth() {
+  return fetch("/api/testAuth", {
+    headers: _headers
+  });
+}
+
+export function setAuth(token) {
+  _headers[TOKEN_KEY] = token;
+  window.localStorage.setItem("token", token);
 }
