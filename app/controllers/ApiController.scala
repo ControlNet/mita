@@ -4,7 +4,10 @@ import io.github.honeycombcheesecake.play.silhouette.api.Silhouette
 import io.github.honeycombcheesecake.play.silhouette.api.exceptions.ConfigurationException
 import io.github.honeycombcheesecake.play.silhouette.api.services.AuthenticatorService
 import io.github.honeycombcheesecake.play.silhouette.api.util.Credentials
-import io.github.honeycombcheesecake.play.silhouette.impl.exceptions.{IdentityNotFoundException, InvalidPasswordException}
+import io.github.honeycombcheesecake.play.silhouette.impl.exceptions.{
+  IdentityNotFoundException,
+  InvalidPasswordException
+}
 import io.github.honeycombcheesecake.play.silhouette.impl.providers.CredentialsProvider
 import models.Exportable.ExportableOps
 import models.{Memory, View}
@@ -77,29 +80,36 @@ class ApiController @Inject() (
     }
   }
 
-  def auth: Action[AnyContent] = silhouette.UnsecuredAction { implicit request =>
-    Try {
-      val body = request.body.asJson.get
-      (body \ "password").as[String]
-    } match {
-      case Failure(_) => BadRequest
-      case Success(password) =>
-        val a = Credentials(UUID.randomUUID.toString, password)
-        Try {
-          Await.result(credentialsProvider.authenticate(a), Duration.Inf)
-        } match {
-          case Failure(e) => e match {
-            case _@(_: InvalidPasswordException | _: ConfigurationException | _: IdentityNotFoundException) =>
-              Unauthorized
-            case _: Throwable => throw e
+  def auth: Action[AnyContent] = silhouette.UnsecuredAction {
+    implicit request =>
+      Try {
+        val body = request.body.asJson.get
+        (body \ "password").as[String]
+      } match {
+        case Failure(_) => BadRequest
+        case Success(password) =>
+          val a = Credentials(UUID.randomUUID.toString, password)
+          Try {
+            Await.result(credentialsProvider.authenticate(a), Duration.Inf)
+          } match {
+            case Failure(e) =>
+              e match {
+                case _ @(_: InvalidPasswordException |
+                    _: ConfigurationException | _: IdentityNotFoundException) =>
+                  Unauthorized
+                case _: Throwable => throw e
+              }
+            case Success(value) =>
+              val authenticator =
+                Await.result(authenticatorService.create(value), Duration.Inf)
+              val token = Await.result(
+                authenticatorService.init(authenticator),
+                Duration.Inf
+              )
+              // Await.result(authenticatorService.embed(token, ), Duration.Inf)
+              Ok(Json.obj("token" -> token))
           }
-          case Success(value) =>
-            val authenticator = Await.result(authenticatorService.create(value), Duration.Inf)
-            val token = Await.result(authenticatorService.init(authenticator), Duration.Inf)
-            // Await.result(authenticatorService.embed(token, ), Duration.Inf)
-            Ok(Json.obj("token" -> token))
-        }
-    }
+      }
   }
 
   def testAuth: Action[AnyContent] = silhouette.SecuredAction {

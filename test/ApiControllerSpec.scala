@@ -39,9 +39,14 @@ class ApiControllerSpec @Inject() (
         credentialsProvider
       )
       val pw = sys.env.getOrElse("MITA_PASSWORD", "password")
-      val response = controller.auth(FakeRequest(POST, s"/api/auth", Headers("Content-Type" -> "application/json"),
-        Json.obj("password" -> pw)
-      ))
+      val response = controller.auth(
+        FakeRequest(
+          POST,
+          s"/api/auth",
+          Headers("Content-Type" -> "application/json"),
+          Json.obj("password" -> pw)
+        )
+      )
 
       status(response) mustBe OK
       contentAsJson(response).toString must include("token")
@@ -55,9 +60,14 @@ class ApiControllerSpec @Inject() (
         credentialsProvider
       )
       val pw = sys.env.getOrElse("MITA_PASSWORD", "password") + "1"
-      val response = controller.auth(FakeRequest(POST, s"/api/auth", Headers("Content-Type" -> "application/json"),
-        Json.obj("password" -> pw)
-      ))
+      val response = controller.auth(
+        FakeRequest(
+          POST,
+          s"/api/auth",
+          Headers("Content-Type" -> "application/json"),
+          Json.obj("password" -> pw)
+        )
+      )
 
       status(response) mustBe UNAUTHORIZED
     }

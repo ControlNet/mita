@@ -48,7 +48,7 @@ export default function Mita(props) {
       .then(setViewNames)
       .catch(() => {
         navigate("/login");
-      })
+      });
   }
 
   useEffect(() => {

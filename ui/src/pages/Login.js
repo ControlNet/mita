@@ -36,9 +36,9 @@ export default function Login(props) {
 
   async function onClick() {
     setButtonStage("processing");
-    const response = await api.auth(input)
+    const response = await api.auth(input);
     if (response.status === 200) {
-      api.setAuth((await response.json()).token)
+      api.setAuth((await response.json()).token);
       navigate("/");
     } else {
       setButtonStage("error");

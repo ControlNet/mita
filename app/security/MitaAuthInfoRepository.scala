@@ -38,5 +38,6 @@ class MitaAuthInfoRepository @Inject() (implicit
       tag: ClassTag[T]
   ): Future[Unit] = ???
 
-  private val password = passwordHasher.hash(sys.env.getOrElse("MITA_PASSWORD", "password"))
+  private val password =
+    passwordHasher.hash(sys.env.getOrElse("MITA_PASSWORD", "password"))
 }

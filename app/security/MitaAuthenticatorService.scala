@@ -3,7 +3,10 @@ package security
 import com.google.inject.Inject
 import io.github.honeycombcheesecake.play.silhouette.api.crypto.Base64AuthenticatorEncoder
 import io.github.honeycombcheesecake.play.silhouette.api.util.Clock
-import io.github.honeycombcheesecake.play.silhouette.impl.authenticators.{JWTAuthenticatorService, JWTAuthenticatorSettings}
+import io.github.honeycombcheesecake.play.silhouette.impl.authenticators.{
+  JWTAuthenticatorService,
+  JWTAuthenticatorSettings
+}
 import io.github.honeycombcheesecake.play.silhouette.impl.util.SecureRandomIDGenerator
 
 import scala.concurrent.ExecutionContext
