@@ -10,7 +10,7 @@ html {
   transition: all 1s;
 }
 
-[data-theme="cupcake"] .btn-square {
+.btn-square, .input, .btn {
   --rounded-btn: 0.5rem !important;
 }
 

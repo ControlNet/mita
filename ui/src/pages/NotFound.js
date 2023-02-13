@@ -1,8 +1,14 @@
 import { Hero } from "react-daisyui";
+import ThemeButton from "../components/ThemeButton";
 
 export default function NotFound(props) {
   return (
     <Hero {...props}>
+      <Hero.Overlay className="bg-base-200">
+        <div className="float-right p-10">
+          <ThemeButton />
+        </div>
+      </Hero.Overlay>
       <Hero.Content className="text-center">
         <div className="max-w-md">
           <h1 className="text-5xl font-bold">404 Not Found</h1>

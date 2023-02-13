@@ -12,6 +12,10 @@ resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 resolvers += "Atlassian Releases" at "https://maven.atlassian.com/public/"
 
 scalaVersion := "2.13.10"
+scalacOptions ++= Seq(
+  "-encoding", "UTF-8"
+)
+javaOptions += "-Dfile.encoding=UTF-8"
 
 libraryDependencies += guice
 libraryDependencies += "net.codingwell" %% "scala-guice" % "5.1.0"

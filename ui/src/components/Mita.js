@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { getViewList } from "../utils/api";
 import View from "./View";
-import { Button, Divider, Range } from "react-daisyui";
+import { Divider, Range } from "react-daisyui";
 import { setUpdateInterval } from "../stores/updateIntervalSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMoon } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import ThemeButton from "./ThemeButton";
 
 export default function Mita(props) {
   const [viewNames, setViewNames] = useState([]);
@@ -76,9 +75,7 @@ export default function Mita(props) {
           <Range step={10} onChange={onIntervalChange} />
         </div>
         <div className="pl-4">
-          <Button data-toggle-theme="dracula,cupcake" shape="square">
-            <FontAwesomeIcon icon={faMoon} className="fa-xl" />
-          </Button>
+          <ThemeButton />
         </div>
       </div>
 

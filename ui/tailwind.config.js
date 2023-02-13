@@ -6,4 +6,7 @@ module.exports = {
     "node_modules/react-daisyui/dist/**/*.js",
   ],
   plugins: [require("daisyui")],
+  daisyui: {
+    themes: ["cupcake", "dracula"]
+  }
 };

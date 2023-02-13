@@ -2,6 +2,7 @@ import { useState } from "react";
 import * as api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { Button, Form, Hero, Input, InputGroup } from "react-daisyui";
+import ThemeButton from "../components/ThemeButton";
 
 export default function Login(props) {
   const [input, setInput] = useState("");
@@ -35,6 +36,7 @@ export default function Login(props) {
 
   async function onClick() {
     setButtonStage("processing");
+    api.removeToken()
     const response = await api.auth(input);
     if (response.status === 200) {
       api.setAuth((await response.json()).token);
@@ -59,7 +61,11 @@ export default function Login(props) {
 
   return (
     <Hero className={props.className}>
-      <Hero.Overlay className="bg-base-200" />
+      <Hero.Overlay className="bg-base-200">
+        <div className="float-right p-10">
+          <ThemeButton />
+        </div>
+      </Hero.Overlay>
       <Hero.Content className="text-center">
         <div className="max-w-md">
           <h1 className="text-5xl font-bold">Mita</h1>
