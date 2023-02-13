@@ -10,8 +10,12 @@ export default function MitaFooter() {
         <div className="w-1" />
         <p className="h-5"></p>
         <div className="grow" />
-        <a href={GITHUB_URL}><p className="align-middle">GitHub</p></a>
-        <a href={GITHUB_URL}><FontAwesomeIcon icon={faGithub} className="h-5 align-middle"/></a>
+        <a href={GITHUB_URL}>
+          <p className="align-middle">GitHub</p>
+        </a>
+        <a href={GITHUB_URL}>
+          <FontAwesomeIcon icon={faGithub} className="h-5 align-middle" />
+        </a>
         <div className="w-1" />
       </div>
     </Footer>

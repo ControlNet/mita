@@ -7,12 +7,12 @@ const headers = {
 headers[TOKEN_KEY] = window.localStorage.getItem("token") || "";
 
 export async function getViewList() {
-  const response = await fetch(`/api/listViews`, {headers});
+  const response = await fetch(`/api/listViews`, { headers });
   return await response.json();
 }
 
 export async function getView(name) {
-  const response = await fetch(`/api/views/${name}`, {headers});
+  const response = await fetch(`/api/views/${name}`, { headers });
   return await response.json();
 }
 

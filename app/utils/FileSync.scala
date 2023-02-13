@@ -27,7 +27,9 @@ object FileSync extends Logging {
           if (oldPath.toFile.exists()) oldPath.toFile.delete()
           newPath.toFile.renameTo(oldPath.toFile)
           view.needSave = false
-          logger.debug(s"Saved ${view.name} to file ${basePath.relativize(oldPath.toUri).getPath}.")
+          logger.debug(
+            s"Saved ${view.name} to file ${basePath.relativize(oldPath.toUri).getPath}."
+          )
       }
     }
   }
@@ -48,7 +50,9 @@ object FileSync extends Logging {
         view.loadFromJson(source.mkString)
       }
       Memory.views.update(view.name, view)
-      logger.debug(s"Loaded ${view.name} from file ${basePath.relativize(file.toURI).getPath}.")
+      logger.debug(
+        s"Loaded ${view.name} from file ${basePath.relativize(file.toURI).getPath}."
+      )
     })
 
   def stop(): Unit = needStop = true

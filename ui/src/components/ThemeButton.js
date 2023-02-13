@@ -7,5 +7,5 @@ export default function ThemeButton(props) {
     <Button {...props} data-toggle-theme="dracula,cupcake" shape="square">
       <FontAwesomeIcon icon={faMoon} className="fa-xl" />
     </Button>
-  )
+  );
 }

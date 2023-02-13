@@ -10,7 +10,9 @@ html {
   transition: all 1s;
 }
 
-.btn-square, .input, .btn {
+.btn-square,
+.input,
+.btn {
   --rounded-btn: 0.5rem !important;
 }
 
