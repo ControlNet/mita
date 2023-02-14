@@ -1,4 +1,4 @@
-name: Client Test
+name: Test
 
 on:
   push:
@@ -16,3 +16,7 @@ jobs:
   client-js-test:
     name: JS Client Test
     uses: ./.github/workflows/client-js-test.yml
+
+  server-test:
+    name: Server Test
+    uses: ./.github/workflows/server-test.yml

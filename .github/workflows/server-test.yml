@@ -1,12 +1,7 @@
 name: Server Test
 
 on:
-  push:
-    branches-ignore:
-      - master
-  pull_request:
-    branches:
-      - '*'
+  workflow_call:
 
 jobs:
   check-code-style:

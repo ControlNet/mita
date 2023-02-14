@@ -5,6 +5,10 @@ on:
       - master
 
 jobs:
+  server-release:
+    name: Server Release
+    uses: ./.github/workflows/server-release.yml
+
   client-python-release:
     name: Python Client Release
     uses: ./.github/workflows/client-python-release.yml
@@ -12,7 +16,3 @@ jobs:
   client-js-release:
     name: JS Client Release
     uses: ./.github/workflows/client-js-release.yml
-
-  server-release:
-    name: Server Release
-    uses: ./.github/workflows/server-release.yml

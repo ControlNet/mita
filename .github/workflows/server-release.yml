@@ -16,7 +16,7 @@ jobs:
       - name: Use Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: "3.10"
           architecture: x64
 
       - name: Get Local Version
@@ -87,10 +87,13 @@ jobs:
           VER=$(python ./get_version.py)
           echo "VERSION=$VER" >> $GITHUB_ENV
 
-      - name: Build
-        uses: playframework/.github/.github/workflows/sbt.yml@v1
+      - name: Setup Scala
+        uses: olafurpg/setup-scala@v10
         with:
-          cmd: sbt stage
+          java-version: "adopt@1.8"
+
+      - name: Build
+        run: sbt stage
 
       - name: Process the Stage
         run: |
