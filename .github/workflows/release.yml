@@ -12,3 +12,7 @@ jobs:
   client-js-release:
     name: JS Client Release
     uses: ./.github/workflows/client-js-release.yml
+
+  server-release:
+    name: Server Release
+    uses: ./.github/workflows/server-release.yml
