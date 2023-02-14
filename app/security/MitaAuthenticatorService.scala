@@ -19,7 +19,7 @@ class MitaAuthenticatorService @Inject() (implicit
       JWTAuthenticatorSettings(
         issuerClaim = "mita",
         authenticatorExpiry = 30.days,
-        sharedSecret = "my-32-character-ultra-secure-and-ultra-long-secret"
+        sharedSecret = sys.env.getOrElse("MITA_TOKEN_SECRET", "my-32-character-ultra-secure-and-ultra-long-secret")
       ),
       None,
       new Base64AuthenticatorEncoder,
