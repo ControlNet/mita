@@ -4,13 +4,17 @@
 
 # Frontend routes
 # Serve index page from public directory
-GET     /                           controllers.FrontendController.index()
+GET     /                           controllers.FrontendController.index
 
 # API routes
-# An example route (Prefix all API routes with apiPrefix defined in application.conf)
-GET     /api/summary                controllers.HomeController.appSummary
-
-GET     /api/echo                   controllers.HomeController.echo
+POST    /api/push                   controllers.ApiController.push
+GET     /api/listViews              controllers.ApiController.listViews
+GET     /api/views/:name            controllers.ApiController.view(name: String)
++nocsrf
+POST    /api/auth                   controllers.ApiController.auth
+GET     /api/testAuth               controllers.ApiController.testAuth
+DELETE  /api/delete/:viewName       controllers.ApiController.deleteView(viewName: String)
+DELETE  /api/delete/:viewName/:componentName controllers.ApiController.deleteComponent(viewName: String, componentName: String)
 
 # Serve static assets under public directory
 GET     /*file                      controllers.FrontendController.assetOrDefault(file)

@@ -1,0 +1,89 @@
+name: JS Client Release
+on:
+  workflow_call:
+
+jobs:
+  check-version:
+    name: Check Version
+    runs-on: ubuntu-20.04
+    outputs:
+      local-version: ${{ steps.get-local-version.outputs.version }}
+      remote-version: ${{ steps.get-remote-version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 14
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Use Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+          architecture: x64
+
+      - name: Get Local Version
+        id: get-local-version
+        working-directory: ./client/js
+        run: echo "version=$(python ./get_version.py)" >> $GITHUB_OUTPUT
+
+      - name: Get Remote Version
+        id: get-remote-version
+        run: echo "version=$(npm view mita-client version)" >> $GITHUB_OUTPUT
+
+  test:
+    name: Test
+    needs: [ "check-version" ]
+    if: needs.check-version.outputs.local-version != needs.check-version.outputs.remote-version
+    uses: ./.github/workflows/client-js-test.yml
+
+  release:
+    name: Release
+    runs-on: ubuntu-20.04
+    needs: [ "test" ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 14
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        working-directory: ./client/js
+        run: |
+          npm install
+          npm run build:prod
+
+      - name: Publish to NPM
+        working-directory: ./client/js
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_API_TOKEN }}
+
+      - name: Use Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+          architecture: x64
+
+      - name: Get the version
+        working-directory: ./client/js
+        run: |
+          VER=$(python ./get_version.py)
+          echo "VERSION=$VER" >> $GITHUB_ENV
+
+      - name: Release to GitHub Release
+        working-directory: ./client/js
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "client-js/${{ env.VERSION }}"
+          title: "[client-js/${{ env.VERSION }}] Mita JS Client Release"
+          prerelease: false
+          files: "mita-client-*.tgz"
+          draft: true

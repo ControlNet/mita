@@ -1,0 +1,108 @@
+name: Server Release
+on:
+  workflow_call:
+
+jobs:
+  check-version:
+    name: Check Version
+    runs-on: ubuntu-20.04
+    outputs:
+      local-version: ${{ steps.get-local-version.outputs.version }}
+      remote-version: ${{ steps.get-remote-version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+          architecture: x64
+
+      - name: Get Local Version
+        id: get-local-version
+        run: echo "version=$(python ./get_version.py)" >> $GITHUB_OUTPUT
+
+      - name: Get Remote Version
+        id: get-remote-version
+        run: | 
+          VER=$(curl -s -S "https://registry.hub.docker.com/v2/repositories/controlnet/mita/tags/" | jq '."results"[]["name"]' | tr -d '"')
+          echo "version=$VER" >> $GITHUB_OUTPUT
+
+  test:
+    name: Test
+    needs: [ "check-version" ]
+    if: needs.check-version.outputs.local-version != needs.check-version.outputs.remote-version
+    uses: ./.github/workflows/server-test.yml
+
+  dockerhub-release:
+    name: Dockerhub Release
+    needs: [ "test" ]
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+          architecture: x64
+
+      - name: Get the version
+        run: |
+          VER=$(python ./get_version.py)
+          echo "VERSION=$VER" >> $GITHUB_ENV
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: controlnet/mita:${{ env.VERSION }}
+
+  github-release:
+    name: GitHub Release
+    needs: [ "test" ]
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+          architecture: x64
+
+      - name: Get the version
+        run: |
+          VER=$(python ./get_version.py)
+          echo "VERSION=$VER" >> $GITHUB_ENV
+
+      - name: Build
+        uses: playframework/.github/.github/workflows/sbt.yml@v1
+        with:
+          cmd: sbt stage
+
+      - name: Process the Stage
+        run: |
+          cd target/universal/stage
+          zip ../../../mita.zip * -r
+
+      - name: Release to GitHub Release
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "server/${{ env.VERSION }}"
+          title: "[server/${{ env.VERSION }}] Mita Server Release"
+          prerelease: false
+          files: "mita.zip"
+          draft: true

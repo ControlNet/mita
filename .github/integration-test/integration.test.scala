@@ -51,7 +51,7 @@ class IntegrationTestSuite
         go to host
         find(
           tagName("h1")
-        ).value.text shouldEqual "Welcome to Scala Play React Seed!"
+        ).value.text shouldEqual "Mita"
       }
     }
   }

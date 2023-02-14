@@ -1,13 +1,23 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  transition: background-color 0.5s;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+.TableLikeGroup-progress::-webkit-progress-value {
+  transition: all 1s;
+}
+
+.btn-square,
+.input,
+.btn {
+  --rounded-btn: 0.5rem !important;
+}
+
+@layer components {
+  .rounded-corners {
+    @apply rounded-2xl border-collapse overflow-hidden;
+  }
 }

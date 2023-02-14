@@ -9,15 +9,26 @@
   },
   "private": true,
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.3.0",
+    "@fortawesome/free-brands-svg-icons": "^6.3.0",
+    "@fortawesome/free-solid-svg-icons": "^6.3.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@reduxjs/toolkit": "^1.9.2",
+    "daisyui": "^2.50.0",
     "kleur": "^4.1.5",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
+    "react-daisyui": "^3.0.2",
     "react-dom": "^18.2.0",
+    "react-redux": "^8.0.5",
     "react-router-dom": "^6.8.1",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "tailwindcss": "^3.2.6",
+    "theme-change": "^2.3.0"
   },
   "devDependencies": {
     "ncp": "^2.0.0",
-    "prettier": "^2.8.3",
+    "prettier": "^2.8.4",
     "rimraf": "^4.1.2"
   },
   "proxy": "http://localhost:9000",

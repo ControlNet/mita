@@ -1,0 +1,99 @@
+name: Python Client Test
+on:
+  workflow_call:
+
+jobs:
+  build-test:
+    name: Build Test
+    runs-on: ubuntu-20.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        working-directory: ./client/python
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install wheel
+          python init.py
+
+      - name: Build
+        working-directory: ./client/python
+        run: |
+          python setup.py sdist bdist_wheel
+
+  import-test:
+    name: Import Test
+    runs-on: ubuntu-20.04
+    needs: ["build-test"]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        working-directory: ./client/python
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python init.py
+
+      - name: Import Library
+        working-directory: ./client/python
+        run: |
+          pip install .
+          python -c "import mita_client"
+
+  unittest:
+    name: Unittest
+    runs-on: ubuntu-20.04
+    needs: ["import-test"]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        working-directory: ./client/python
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python init.py
+
+      - name: Run Unittest
+        working-directory: ./client/python
+        run: |
+          pip install .
+          python -m unittest discover test

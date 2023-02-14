@@ -1,0 +1,59 @@
+name: Server Test
+
+on:
+  push:
+    branches-ignore:
+      - master
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  check-code-style:
+    name: Code Style
+    uses: playframework/.github/.github/workflows/sbt.yml@v1
+    with:
+      cmd: sbt validateCode
+
+  unittest:
+    name: Unittest
+    needs: # Waiting more lightweight checks
+      - "check-code-style"
+    uses: playframework/.github/.github/workflows/sbt.yml@v1
+    with:
+      cmd: sbt test
+
+  integration-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [development, production]
+        include:
+          - mode: development
+            port: 3000
+          - mode: production
+            port: 9000
+    name: Integration / ${{ matrix.mode }}
+    needs:
+      - "unittest"
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Build docker image
+        run: docker build -f .github/integration-test/Dockerfile-${{ matrix.mode }} -t mita .
+
+      - name: Run docker image
+        run: docker run -p ${{ matrix.port }}:${{ matrix.port }} -d mita
+
+      - name: Setup scala-cli
+        uses: VirtusLab/scala-cli-setup@v0.1.4
+        with:
+          scala-cli-version: 0.1.4
+
+      - name: Wait for application
+        working-directory: .github/integration-test
+        run: scala-cli test . --server=false --java-opt "-Dapplication.port=${{ matrix.port }}"
