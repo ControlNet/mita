@@ -1,0 +1,50 @@
+name: Deploy Demo
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy-demo:
+    name: Deploy Demo
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 14
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Use Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+          architecture: x64
+
+      - name: Install dependencies
+        working-directory: ./ui
+        run: |
+          npm install
+          npm install gh-pages
+
+      - name: Process Config and Sources
+        run: |
+          cp ./.github/ui-demo/api.js ./ui/src/utils/api.js
+          python ./.github/ui-demo/process.py --input ./ui/src/pages/Login.js --input2 ./ui/package.json
+          cd ui
+
+      - name: Deploy
+        working-directory: ./ui
+        run: |
+          git config --global user.email "smczx@hotmail.com"
+          git config --global user.name "ControlNet"
+          git remote set-url origin https://${GITHUB_TOKEN}@github.com/ControlNet/mita
+          npm run build
+          echo "mita.controlnet.space" > ../public/CNAME
+          npm run deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
