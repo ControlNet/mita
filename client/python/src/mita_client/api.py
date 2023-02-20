@@ -138,4 +138,6 @@ class MitaWorker:
                     warnings.warn(f"[Mita] Connection error!")
                 else:
                     self.push(d)
-            print(f"[Mita] Pushed in {time.time() - t0:.3f} sec.")
+
+            if self.client.verbose:
+                print(f"[Mita] Pushed in {time.time() - t0:.3f} sec.")
