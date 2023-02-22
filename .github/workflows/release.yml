@@ -8,11 +8,22 @@ jobs:
   server-release:
     name: Server Release
     uses: ./.github/workflows/server-release.yml
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
   client-python-release:
     name: Python Client Release
     uses: ./.github/workflows/client-python-release.yml
+    secrets:
+      PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+      ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
   client-js-release:
     name: JS Client Release
     uses: ./.github/workflows/client-js-release.yml
+    secrets:
+      NPM_API_TOKEN: ${{ secrets.NPM_API_TOKEN }}
+      ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+

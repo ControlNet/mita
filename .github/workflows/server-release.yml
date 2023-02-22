@@ -1,6 +1,13 @@
 name: Server Release
 on:
   workflow_call:
+    secrets:
+      DOCKERHUB_USERNAME:
+          required: true
+      DOCKERHUB_TOKEN:
+          required: true
+      ACCESS_TOKEN:
+          required: true
 
 jobs:
   check-version:
@@ -27,7 +34,7 @@ jobs:
         id: get-remote-version
         run: | 
           VER=$(curl -s -S "https://registry.hub.docker.com/v2/repositories/controlnet/mita/tags/" | jq '."results"[]["name"]' | tr -d '"')
-          echo "version=$VER" >> $GITHUB_OUTPUT
+          echo "version=$(python ./get_dockerhub_version.py)" >> $GITHUB_OUTPUT
 
   test:
     name: Test
@@ -47,7 +54,7 @@ jobs:
       - name: Use Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: "3.10"
           architecture: x64
 
       - name: Get the version
@@ -79,7 +86,7 @@ jobs:
       - name: Use Python 3.10
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: "3.10"
           architecture: x64
 
       - name: Get the version
@@ -103,7 +110,7 @@ jobs:
       - name: Release to GitHub Release
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          repo_token: "${{ secrets.ACCESS_TOKEN }}"
           automatic_release_tag: "server/${{ env.VERSION }}"
           title: "[server/${{ env.VERSION }}] Mita Server Release"
           prerelease: false
