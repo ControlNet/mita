@@ -13,6 +13,7 @@ GET     /api/views/:name            controllers.ApiController.view(name: String)
 +nocsrf
 POST    /api/auth                   controllers.ApiController.auth
 GET     /api/testAuth               controllers.ApiController.testAuth
+DELETE  /api/delete                 controllers.ApiController.deleteAll
 DELETE  /api/delete/:viewName       controllers.ApiController.deleteView(viewName: String)
 DELETE  /api/delete/:viewName/:componentName controllers.ApiController.deleteComponent(viewName: String, componentName: String)
 

@@ -56,4 +56,9 @@ object FileSync extends Logging {
     })
 
   def stop(): Unit = needStop = true
+
+  def remove(viewName: String): Unit = {
+    val path = savePath.resolve(viewName + ".json")
+    if (path.toFile.exists()) path.toFile.delete()
+  }
 }

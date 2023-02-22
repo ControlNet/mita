@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
-import { getViewList } from "../utils/api";
+import { deleteAll, getViewList } from "../utils/api";
 import View from "./View";
-import { Divider, Range } from "react-daisyui";
+import { Button, Divider, Modal, Range } from "react-daisyui";
 import { setUpdateInterval } from "../stores/updateIntervalSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ThemeButton from "./ThemeButton";
+import DeleteButton from "./DeleteButton";
 
 export default function Mita(props) {
   const [viewNames, setViewNames] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
   const dispatch = useDispatch();
   const interval = useSelector((state) => state.updateInterval.value);
   const navigate = useNavigate();
@@ -65,6 +67,19 @@ export default function Mita(props) {
     dispatch(setUpdateInterval(rangeLevelToInterval(Number(e.target.value))));
   }
 
+  async function onClickDeleteYes() {
+    await deleteAll();
+    setModalVisible(false);
+  }
+
+  function onClickDeleteNo() {
+    setModalVisible(false);
+  }
+
+  function toggleVisible() {
+    setModalVisible(!modalVisible);
+  }
+
   return (
     <div className={props.className + " flex flex-col p-10"}>
       <div className="flex flex-row">
@@ -75,7 +90,20 @@ export default function Mita(props) {
           <Range step={10} onChange={onIntervalChange} />
         </div>
         <div className="pl-4">
-          <ThemeButton />
+          <ThemeButton className="mr-2" />
+          <DeleteButton className="mr-2" onClick={toggleVisible} />
+          <Modal open={modalVisible}>
+            <Modal.Header className="font-bold">
+              Confirm to delete all views?
+            </Modal.Header>
+
+            <Modal.Actions>
+              <Button onClick={onClickDeleteYes} color="error">
+                Yes
+              </Button>
+              <Button onClick={onClickDeleteNo}>No</Button>
+            </Modal.Actions>
+          </Modal>
         </div>
       </div>
 

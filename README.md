@@ -3,6 +3,8 @@
 Mita, named as Multi-Tangled, is a web application for monitoring runtime status and data of multiple machines 
 (clients).
 
+Demo: [https://mita.controlnet.space](https://mita.controlnet.space)
+
 ## Get Started
 
 ### Run Server
@@ -11,7 +13,7 @@ The server is used to accept client post data and host the web UI.
 
 #### Docker
 ```bash
-docker run -p <PORT>:9000 -e MITA_PASSWORD=<PASSWORD> controlnet/mita:<VERSION>
+docker run -p <PORT>:9000 -e MITA_PASSWORD=<PASSWORD> controlnet/mita[:<VERSION>]
 ```
 
 #### Environment Variables

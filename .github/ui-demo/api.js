@@ -33,6 +33,21 @@ export function setAuth(token) {
 export function removeToken() {
 }
 
+export function deleteView(viewName) {
+  delete data[viewName]
+  data.views = data.views.filter(v => v !== viewName)
+}
+
+export function deleteAll() {
+  for (const view of data.views) {
+    deleteView(view)
+  }
+}
+
+export function deleteComponent(viewName, componentName) {
+  data[viewName] = data[viewName].filter(v => v.name !== componentName)
+}
+
 // mock data
 const data = {
   "views": ["view1", "view2"],

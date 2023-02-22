@@ -10,12 +10,13 @@ from .view import View
 
 class Mita:
 
-    def __init__(self, url: str, password: str, num_workers: int = 1):
+    def __init__(self, url: str, password: str, num_workers: int = 1, verbose: bool = False):
         self.url = url
         self.password = password
         self.views: List[View] = []
         self.worker = MitaWorker(url, self)
         self.num_workers = num_workers
+        self.verbose = verbose
 
     def __enter__(self) -> Mita:
         self.auth()
