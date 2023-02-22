@@ -14,6 +14,7 @@ import models.{Memory, View}
 import play.api.libs.json.{JsArray, Json}
 import play.api.mvc._
 import security.MitaEnv
+import utils.FileSync
 
 import java.util.UUID
 import javax.inject._
@@ -63,9 +64,18 @@ class ApiController @Inject() (
   def deleteView(viewName: String): Action[AnyContent] =
     silhouette.SecuredAction {
       Memory.views.remove(viewName)
+      FileSync.remove(viewName)
       Memory.needSave = true
       Ok
     }
+
+  def deleteAll: Action[AnyContent] = silhouette.SecuredAction {
+    val views = Memory.views.keys.toList
+    Memory.views.clear()
+    views.foreach(FileSync.remove)
+    Memory.needSave = true
+    Ok
+  }
 
   def deleteComponent(
       viewName: String,

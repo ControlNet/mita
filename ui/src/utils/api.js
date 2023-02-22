@@ -39,3 +39,24 @@ export function removeToken() {
   delete headers[TOKEN_KEY];
   window.localStorage.removeItem("token");
 }
+
+export function deleteView(viewName) {
+  return fetch(`/api/delete/${viewName}`, {
+    method: "DELETE",
+    headers: headers,
+  });
+}
+
+export function deleteAll() {
+  return fetch("/api/delete", {
+    method: "DELETE",
+    headers: headers,
+  });
+}
+
+export function deleteComponent(viewName, componentName) {
+  return fetch(`/api/delete/${viewName}/${componentName}`, {
+    method: "DELETE",
+    headers: headers,
+  });
+}

@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from typing import List
+import socket
+from typing import List, Optional
 
 from .component import Component
 
 
 class View:
 
-    def __init__(self, name: str):
+    def __init__(self, name: Optional[str] = None):
         self.data: List[Component] = []
-        self.name = name
+        self.name = name or socket.gethostname()
 
     def add(self, *component: Component) -> View:
         self.data.extend(component)

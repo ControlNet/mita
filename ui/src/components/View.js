@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { getView } from "../utils/api";
+import { deleteView, getView } from "../utils/api";
 import _ from "lodash";
 import TableLikeGroup from "./TableLikeGroup";
 import LoggerGroup from "./LoggerGroup";
 import { useSelector } from "react-redux";
+import DeleteButton from "./DeleteButton";
 
 export default function View(props) {
   const [groups, setGroups] = useState({});
@@ -39,9 +40,18 @@ export default function View(props) {
 
   const needRenderLogGroup = useMemo(() => "Logger" in groups, [groups]);
 
+  async function onClickDelete() {
+    await deleteView(props.viewName);
+  }
+
   return (
-    <div className={"m-2"}>
-      <h1 className="text-2xl font-bold mb-5">{props.viewName}</h1>
+    <div className="m-2">
+      <div className="flex flex-row my-2">
+        <h1 className="text-2xl font-bold mb-5">{props.viewName}</h1>
+        <div className="flex-grow" />
+        <DeleteButton onClick={onClickDelete} />
+      </div>
+
       {needRenderTableLikeGroup ? (
         <TableLikeGroup
           variableGroup={variableGroup}

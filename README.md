@@ -13,7 +13,7 @@ The server is used to accept client post data and host the web UI.
 
 #### Docker
 ```bash
-docker run -p <PORT>:9000 -e MITA_PASSWORD=<PASSWORD> controlnet/mita
+docker run -p <PORT>:9000 -e MITA_PASSWORD=<PASSWORD> controlnet/mita[:<VERSION>]
 ```
 
 #### Environment Variables
