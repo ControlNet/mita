@@ -1,6 +1,11 @@
 name: Python Client Release
 on:
   workflow_call:
+    secrets:
+      PYPI_API_TOKEN:
+        required: true
+      ACCESS_TOKEN:
+        required: true
 
 jobs:
   check-version:
@@ -73,7 +78,7 @@ jobs:
       - name: Release to GitHub Release
         uses: marvinpinto/action-automatic-releases@latest
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          repo_token: "${{ secrets.ACCESS_TOKEN }}"
           automatic_release_tag: "client-python/${{ env.VERSION }}"
           title: "[client-python/${{ env.VERSION }}] Mita Python Client Release"
           prerelease: false
