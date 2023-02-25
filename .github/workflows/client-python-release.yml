@@ -55,7 +55,6 @@ jobs:
           pip install -r requirements.txt
           pip install wheel
           python init.py
-          cp ../../LICENSE .
           cp ../../README.md .
 
       - name: Build package for mita_client
