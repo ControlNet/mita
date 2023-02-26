@@ -33,7 +33,7 @@ jobs:
       - name: Get Remote Version
         id: get-remote-version
         run: | 
-          VER=$(curl -s -S "https://registry.hub.docker.com/v2/repositories/controlnet/mita/tags/" | jq '."results"[]["name"]' | tr -d '"')
+          pip install packaging
           echo "version=$(python ./get_dockerhub_version.py)" >> $GITHUB_OUTPUT
 
   test:

@@ -69,3 +69,10 @@ with Mita(ADDRESS, PASSWORD) as client:
         
         client.push()
 ```
+
+## License
+
+| Module | License                        |
+|--------|--------------------------------|
+| server | [AGPL](./LICENSE)              |
+| client | [MIT](./client/python/LICENSE) |
