@@ -78,7 +78,7 @@ jobs:
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.ACCESS_TOKEN }}"
-          automatic_release_tag: "client-python/${{ env.VERSION }}"
+          automatic_release_tag: "client/python/${{ env.VERSION }}"
           title: "[client-python/${{ env.VERSION }}] Mita Python Client Release"
           prerelease: false
           files: "./client/python/dist/*"
