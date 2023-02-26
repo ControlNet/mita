@@ -86,7 +86,7 @@ jobs:
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.ACCESS_TOKEN }}"
-          automatic_release_tag: "client-js/${{ env.VERSION }}"
+          automatic_release_tag: "client/js/${{ env.VERSION }}"
           title: "[client-js/${{ env.VERSION }}] Mita JS Client Release"
           prerelease: false
           files: "./client/js/mita-client-*.tgz"
