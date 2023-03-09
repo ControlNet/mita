@@ -54,7 +54,7 @@ def auth(url: str, password: str) -> State:
         return State.SUCCESS
     except HTTPError:
         return State.AUTH_ERROR
-    except URLError:
+    except (URLError, TimeoutError):
         return State.CONNECTION_ERROR
 
 
@@ -81,7 +81,7 @@ def push(url: str, data: dict) -> State:
         return State.SUCCESS
     except HTTPError:
         return State.AUTH_ERROR
-    except URLError:
+    except (URLError, TimeoutError):
         return State.CONNECTION_ERROR
 
 
