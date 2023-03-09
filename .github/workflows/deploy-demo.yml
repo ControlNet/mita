@@ -43,7 +43,7 @@ jobs:
           git config --global user.name "ControlNet"
           git remote set-url origin https://${GITHUB_TOKEN}@github.com/ControlNet/mita
           npm run build
-          echo "mita.controlnet.space" > ../public/CNAME
+          echo "mita-demo.controlnet.space" > ../public/CNAME
           npm run deploy
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
