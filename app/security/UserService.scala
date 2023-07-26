@@ -7,5 +7,5 @@ import scala.concurrent.Future
 
 object UserService extends IdentityService[User] {
   override def retrieve(loginInfo: LoginInfo): Future[Option[User]] =
-    Future.successful(Some(User(loginInfo)))
+    Future.successful(User(loginInfo))
 }
