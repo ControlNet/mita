@@ -32,8 +32,7 @@ def runOnCommandline(firstScript: String, otherScripts: String*)(implicit
 } !
 
 // Check of node_modules directory exist in given directory.
-def isNodeModulesInstalled(implicit dir: File): Boolean =
-  (dir / "node_modules").exists()
+def isNodeModulesInstalled(implicit dir: File): Boolean = (dir / "node_modules").exists()
 
 // Execute `npm install` command to install all node module dependencies. Return Success if already installed.
 def runNpmInstall(implicit dir: File): Int =
@@ -69,17 +68,14 @@ lazy val `ui-code-style` = taskKey[Unit]("Apply code style.")
 
 `ui-code-style` := {
   implicit val userInterfaceRoot = baseDirectory.value / "ui"
-  if (executeUiCodeStyle != Success)
-    throw new Exception("UI code style failed!")
+  if (executeUiCodeStyle != Success) throw new Exception("UI code style failed!")
 }
 
-lazy val `ui-code-style-check` =
-  taskKey[Unit]("Check if code style was applied.")
+lazy val `ui-code-style-check` = taskKey[Unit]("Check if code style was applied.")
 
 `ui-code-style-check` := {
   implicit val userInterfaceRoot = baseDirectory.value / "ui"
-  if (executeUiCodeStyleCheck != Success)
-    throw new Exception("UI code style check failed!")
+  if (executeUiCodeStyleCheck != Success) throw new Exception("UI code style check failed!")
 }
 
 lazy val `ui-test` = taskKey[Unit]("Run UI tests when testing application.")
@@ -89,13 +85,11 @@ lazy val `ui-test` = taskKey[Unit]("Run UI tests when testing application.")
   if (executeUiTests != Success) throw new Exception("UI tests failed!")
 }
 
-lazy val `ui-prod-build` =
-  taskKey[Unit]("Run UI build when packaging the application.")
+lazy val `ui-prod-build` = taskKey[Unit]("Run UI build when packaging the application.")
 
 `ui-prod-build` := {
   implicit val userInterfaceRoot = baseDirectory.value / "ui"
-  if (executeProdBuild != Success)
-    throw new Exception("Oops! UI Build crashed.")
+  if (executeProdBuild != Success) throw new Exception("Oops! UI Build crashed.")
 }
 
 // Execute frontend prod build task prior to play dist execution.
