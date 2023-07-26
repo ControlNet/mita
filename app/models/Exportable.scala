@@ -18,19 +18,16 @@ object Exportable {
   ): String = exportable.exportJson(value)
 
   implicit class ExportableOps[T](a: T) {
-    def exportJsObject(implicit exportable: Exportable[T]): JsValue =
-      Exportable.exportJsObject[T](a)
+    def exportJsObject(implicit exportable: Exportable[T]): JsValue = Exportable.exportJsObject[T](a)
 
-    def exportJson(implicit exportable: Exportable[T]): String =
-      Exportable.exportJson[T](a)
+    def exportJson(implicit exportable: Exportable[T]): String = Exportable.exportJson[T](a)
   }
 
-  private def exportStringComponent(value: Component[String]): JsObject =
-    Json.obj(
-      "cls" -> value.cls,
-      "name" -> value.name,
-      "value" -> value.value
-    )
+  private def exportStringComponent(value: Component[String]): JsObject = Json.obj(
+    "cls" -> value.cls,
+    "name" -> value.name,
+    "value" -> value.value
+  )
 
   implicit val variableIntExportable: Exportable[Variable[Int]] = value =>
     Json.obj(
@@ -46,8 +43,7 @@ object Exportable {
       "value" -> value.value
     )
 
-  implicit val variableStringExportable: Exportable[Variable[String]] =
-    exportStringComponent
+  implicit val variableStringExportable: Exportable[Variable[String]] = exportStringComponent
 
   implicit val progressBarExportable: Exportable[ProgressBar] = value =>
     Json.obj(
@@ -87,8 +83,7 @@ object Exportable {
       case logger: Logger           => logger.exportJsObject
       case progressBar: ProgressBar => progressBar.exportJsObject
       case image: Image             => image.exportJsObject
-      case Variable(name, value) =>
-        value match {
+      case Variable(name, value) => value match {
           case v: Int    => Variable[Int](name, v).exportJsObject
           case v: Double => Variable[Double](name, v).exportJsObject
           case v: String => Variable[String](name, v).exportJsObject

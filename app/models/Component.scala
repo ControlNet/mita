@@ -1,15 +1,7 @@
 package models
 
 import models.LineChart.Datum
-import play.api.libs.json.{
-  JsArray,
-  JsBoolean,
-  JsNull,
-  JsNumber,
-  JsObject,
-  JsString,
-  JsValue
-}
+import play.api.libs.json.{JsArray, JsBoolean, JsNull, JsNumber, JsObject, JsString, JsValue}
 
 trait Component[T <: Any] {
   val cls: String
@@ -33,24 +25,20 @@ object Component {
           case _                => throw new Exception("Unknown type")
         }
         Variable(name, value)
-      case JsString("ProgressBar") =>
-        ProgressBar(
+      case JsString("ProgressBar") => ProgressBar(
           componentName,
           obj("value").as[JsNumber].value.toInt,
           obj("total").as[JsNumber].value.toInt
         )
-      case JsString("Image") =>
-        Image(
+      case JsString("Image") => Image(
           componentName,
           obj("value").as[JsString].value
         )
-      case JsString("Logger") =>
-        Logger(
+      case JsString("Logger") => Logger(
           componentName,
           obj("value").as[JsArray].value.map(_.as[JsString].value).toList
         )
-      case JsString("LineChart") =>
-        LineChart(
+      case JsString("LineChart") => LineChart(
           componentName,
           obj("value")
             .as[JsArray]
@@ -76,18 +64,15 @@ case class Variable[T](name: String, value: T) extends Component[T] {
   override val cls: String = "Variable"
 }
 
-case class ProgressBar(name: String, value: Int, total: Int)
-    extends Component[Int] {
+case class ProgressBar(name: String, value: Int, total: Int) extends Component[Int] {
   override val cls: String = "ProgressBar"
 }
 
-case class Image(name: String, value: String /*image path*/ )
-    extends Component[String] {
+case class Image(name: String, value: String /*image path*/ ) extends Component[String] {
   override val cls: String = "Image"
 }
 
-case class Logger(name: String, value: List[String] /*message rows*/ )
-    extends Component[List[String]] {
+case class Logger(name: String, value: List[String] /*message rows*/ ) extends Component[List[String]] {
   override val cls: String = "Logger"
 }
 

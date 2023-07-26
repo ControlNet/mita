@@ -2,7 +2,13 @@ import com.google.inject.{AbstractModule, Provides}
 import io.github.honeycombcheesecake.play.silhouette.api.repositories.AuthInfoRepository
 import io.github.honeycombcheesecake.play.silhouette.api.services.{AuthenticatorService, IdentityService}
 import io.github.honeycombcheesecake.play.silhouette.api.util.{Clock, PasswordHasher, PasswordHasherRegistry}
-import io.github.honeycombcheesecake.play.silhouette.api.{Environment, EventBus, RequestProvider, Silhouette, SilhouetteProvider}
+import io.github.honeycombcheesecake.play.silhouette.api.{
+  Environment,
+  EventBus,
+  RequestProvider,
+  Silhouette,
+  SilhouetteProvider
+}
 import io.github.honeycombcheesecake.play.silhouette.impl.authenticators.JWTAuthenticator
 import io.github.honeycombcheesecake.play.silhouette.impl.providers.{BasicAuthProvider, CredentialsProvider}
 import io.github.honeycombcheesecake.play.silhouette.password.BCryptSha256PasswordHasher
@@ -56,8 +62,7 @@ class Module extends AbstractModule with ScalaModule {
   @Provides
   def providePasswordHasherRegistry(implicit
       passwordHasher: PasswordHasher
-  ): PasswordHasherRegistry =
-    PasswordHasherRegistry(passwordHasher, Nil)
+  ): PasswordHasherRegistry = PasswordHasherRegistry(passwordHasher, Nil)
 
   @Provides
   def provideAuthProvider(implicit

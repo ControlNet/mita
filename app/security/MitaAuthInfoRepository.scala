@@ -18,9 +18,9 @@ class MitaAuthInfoRepository @Inject() (implicit
   )(implicit tag: ClassTag[T]): Future[Option[T]] = loginInfo.providerKey match {
     case "admin" => Future.successful(Some(password.asInstanceOf[T]))
     case "guest" => guestPassword match {
-      case Some(guestPw) => Future.successful(Some(guestPw.asInstanceOf[T]))
-      case None => Future.successful(None)
-    }
+        case Some(guestPw) => Future.successful(Some(guestPw.asInstanceOf[T]))
+        case None          => Future.successful(None)
+      }
   }
 
   override def add[T <: AuthInfo](
@@ -42,11 +42,10 @@ class MitaAuthInfoRepository @Inject() (implicit
       tag: ClassTag[T]
   ): Future[Unit] = ???
 
-  private val password =
-    passwordHasher.hash(sys.env.getOrElse("MITA_PASSWORD", "password"))
+  private val password = passwordHasher.hash(sys.env.getOrElse("MITA_PASSWORD", "password"))
 
   private val guestPassword: Option[PasswordInfo] = sys.env.getOrElse("MITA_GUEST_PASSWORD", "changeit") match {
     case "changeit" => None
-    case password => Some(passwordHasher.hash(password))
+    case password   => Some(passwordHasher.hash(password))
   }
 }

@@ -4,9 +4,16 @@ import io.github.honeycombcheesecake.play.silhouette.api.{LoginInfo, RequestProv
 import io.github.honeycombcheesecake.play.silhouette.api.exceptions.ConfigurationException
 import io.github.honeycombcheesecake.play.silhouette.api.repositories.AuthInfoRepository
 import io.github.honeycombcheesecake.play.silhouette.api.util.{Credentials, PasswordHasherRegistry, PasswordInfo}
-import io.github.honeycombcheesecake.play.silhouette.impl.exceptions.{IdentityNotFoundException, InvalidPasswordException}
+import io.github.honeycombcheesecake.play.silhouette.impl.exceptions.{
+  IdentityNotFoundException,
+  InvalidPasswordException
+}
 import io.github.honeycombcheesecake.play.silhouette.impl.providers.{CredentialsProvider, PasswordProvider}
-import io.github.honeycombcheesecake.play.silhouette.impl.providers.PasswordProvider.{HasherIsNotRegistered, PasswordDoesNotMatch, PasswordInfoNotFound}
+import io.github.honeycombcheesecake.play.silhouette.impl.providers.PasswordProvider.{
+  HasherIsNotRegistered,
+  PasswordDoesNotMatch,
+  PasswordInfoNotFound
+}
 import play.api.libs.json.JsResultException
 import play.api.mvc.{AnyContent, Request}
 

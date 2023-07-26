@@ -4,7 +4,10 @@ import io.github.honeycombcheesecake.play.silhouette.api.actions.SecuredRequest
 import io.github.honeycombcheesecake.play.silhouette.api.exceptions.ConfigurationException
 import io.github.honeycombcheesecake.play.silhouette.api.services.AuthenticatorService
 import io.github.honeycombcheesecake.play.silhouette.api.{RequestProvider, Silhouette}
-import io.github.honeycombcheesecake.play.silhouette.impl.exceptions.{IdentityNotFoundException, InvalidPasswordException}
+import io.github.honeycombcheesecake.play.silhouette.impl.exceptions.{
+  IdentityNotFoundException,
+  InvalidPasswordException
+}
 import models.Exportable.ExportableOps
 import models.{Memory, View}
 import play.api.libs.json.{JsArray, Json}
@@ -128,7 +131,7 @@ class ApiController @Inject() (
       .map { case (token, role) => Ok(Json.obj("token" -> token, "role" -> role)) }
       .recover {
         case _ @(_: InvalidPasswordException | _: ConfigurationException | _: IdentityNotFoundException) => Unauthorized
-        case _: Throwable => BadRequest
+        case _: Throwable                                                                                => BadRequest
       }
 
     Await.result(future, Duration.Inf)
@@ -142,5 +145,5 @@ class ApiController @Inject() (
     request.identity match {
       case User.Admin => block
       case User.Guest => Unauthorized
-  }
+    }
 }

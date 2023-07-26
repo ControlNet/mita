@@ -6,6 +6,5 @@ import io.github.honeycombcheesecake.play.silhouette.api.services.IdentityServic
 import scala.concurrent.Future
 
 object UserService extends IdentityService[User] {
-  override def retrieve(loginInfo: LoginInfo): Future[Option[User]] =
-    Future.successful(User(loginInfo))
+  override def retrieve(loginInfo: LoginInfo): Future[Option[User]] = Future.successful(User(loginInfo))
 }
