@@ -1,5 +1,10 @@
+import { setRole as setRoleAction } from "../stores/roleSlice";
+import store from "../stores/store";
+
 let _password = 0
+let _role = "admin"
 const PASSWORD = "123"
+store.dispatch(setRoleAction(_role));
 
 export async function getViewList() {
   return data.views;
@@ -14,7 +19,8 @@ export async function auth(password) {
     status: password === PASSWORD ? 200 : 401,
     json: async () => {
       return {
-        token: password
+        token: password,
+        role: "admin"
       }
     }
   }
@@ -28,6 +34,10 @@ export async function testAuth() {
 
 export function setAuth(token) {
   _password = token
+}
+
+export function setRole(role) {
+  _role = role
 }
 
 export function removeToken() {
@@ -86,15 +96,15 @@ const data = {
 
 // https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
 function randomString(length) {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    let counter = 0;
-    while (counter < length) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
-      counter += 1;
-    }
-    return result;
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
 }
 
 setInterval(() => {
