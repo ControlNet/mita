@@ -13,12 +13,17 @@ The server is used to accept client post data and host the web UI.
 
 #### Docker
 ```bash
-docker run -p <PORT>:9000 -e MITA_PASSWORD=<PASSWORD> controlnet/mita[:<VERSION>]
+docker run \
+  -p <PORT>:9000 \
+  -e MITA_PASSWORD=<PASSWORD> \
+  [-e MITA_GUEST_PASSWORD=<GUEST_PASSWORD>] \
+  controlnet/mita[:<VERSION>]
 ```
 
 #### Environment Variables
 
-- `MITA_PASSWORD`: Password for accessing the api and web.
+- `MITA_PASSWORD`: Password for **admin** accessing the api and web for read/write.
+- `MITA_GUEST_PASSWORD`: Password for **guest** accessing the api and web for read only.
 - `REACT_APP_PASSWORD`: _Optional_, set the default password for the frontend.
 - `MITA_SECRET_KEY`: _Optional_, Server secret key for CRSF token.
 - `MITA_TOKEN_SECRET`: _Optional_, Server secret key for JWT authentication token.
