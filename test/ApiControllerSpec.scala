@@ -1,22 +1,20 @@
-package controllers
-
-import io.github.honeycombcheesecake.play.silhouette.api.{RequestProvider, Silhouette}
-import io.github.honeycombcheesecake.play.silhouette.api.services.AuthenticatorService
-import io.github.honeycombcheesecake.play.silhouette.impl.providers.CredentialsProvider
+import controllers.ApiController
 import models.Memory
 import org.scalatest.BeforeAndAfterAll
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice._
+import play.api.Application
 import play.api.Play.materializer
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceInjectorBuilder}
 import play.api.libs.json.Json
 import play.api.mvc.Headers
 import play.api.test.Helpers._
 import play.api.test._
-import security.MitaEnv
+import play.test.WithApplication
 import utils.FileSync
 
-import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import java.lang.annotation.Annotation
+import javax.inject.Scope
 
 /** Add your spec here. You can mock out a whole application including requests,
   * plugins etc.
@@ -24,22 +22,7 @@ import scala.concurrent.ExecutionContext
   * For more information, see
   * https://www.playframework.com/documentation/latest/ScalaTestingWithScalaTest
   */
-class ApiControllerSpec @Inject() (
-    silhouette: Silhouette[MitaEnv],
-    authenticatorService: AuthenticatorService[MitaEnv#A],
-    requestProvider: RequestProvider
-)(implicit ec: ExecutionContext)
-    extends PlaySpec
-    with GuiceOneAppPerTest
-    with Injecting
-    with BeforeAndAfterAll {
-
-  val controller = new ApiController(
-    stubControllerComponents(),
-    silhouette,
-    authenticatorService,
-    requestProvider
-  )
+class ApiControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting with BeforeAndAfterAll {
 
   // remove temp files generated
   override def afterAll(): Unit = {
@@ -53,14 +36,15 @@ class ApiControllerSpec @Inject() (
     "auth admin return OK with correct password" in {
 
       val pw = sys.env.getOrElse("MITA_PASSWORD", "password")
-      val response = controller.auth(
+      val response = route(
+        app,
         FakeRequest(
           POST,
           s"/api/auth",
           Headers("Content-Type" -> "application/json"),
           Json.obj("password" -> pw)
         )
-      )
+      ).get
 
       status(response) mustBe OK
       contentAsJson(response).toString must include("token")
@@ -70,14 +54,15 @@ class ApiControllerSpec @Inject() (
 
     "auth guest return OK with correct password" in {
       val pw = sys.env.getOrElse("MITA_GUEST_PASSWORD", "changeit")
-      val response = controller.auth(
+      val response = route(
+        app,
         FakeRequest(
           POST,
           s"/api/auth",
           Headers("Content-Type" -> "application/json"),
           Json.obj("password" -> pw)
         )
-      )
+      ).get
 
       if (pw == "changeit") {
         status(response) mustBe UNAUTHORIZED
@@ -91,26 +76,28 @@ class ApiControllerSpec @Inject() (
 
     "auth return Unauthorized with incorrect password" in {
       val pw = sys.env.getOrElse("MITA_PASSWORD", "password") + "1"
-      val response = controller.auth(
+      val response = route(
+        app,
         FakeRequest(
           POST,
           s"/api/auth",
           Headers("Content-Type" -> "application/json"),
           Json.obj("password" -> pw)
         )
-      )
+      ).get
 
       status(response) mustBe UNAUTHORIZED
 
       val guestPw = sys.env.getOrElse("MITA_GUEST_PASSWORD", "password") + "1"
-      val guestResponse = controller.auth(
+      val guestResponse = route(
+        app,
         FakeRequest(
           POST,
           s"/api/auth",
           Headers("Content-Type" -> "application/json"),
           Json.obj("password" -> guestPw)
         )
-      )
+      ).get
 
       status(guestResponse) mustBe UNAUTHORIZED
     }
@@ -119,7 +106,8 @@ class ApiControllerSpec @Inject() (
   "ApiController POST" should {
     "push success with admin token" in {
       val token = TokenOf.admin
-      val response = controller.push(
+      val response = route(
+        app,
         FakeRequest(
           POST,
           s"/api/push",
@@ -131,7 +119,7 @@ class ApiControllerSpec @Inject() (
             )
           )
         )
-      )
+      ).get
 
       status(response) mustBe OK
       // check in memory
@@ -143,28 +131,32 @@ class ApiControllerSpec @Inject() (
     }
 
     "push fail with guest token" in {
-      val token = TokenOf.guest.get
-      val response = controller.push(
-        FakeRequest(
-          POST,
-          s"/api/push",
-          Headers("Content-Type" -> "application/json", "X-Auth-Token" -> token),
-          Json.obj(
-            "view" -> "test_view_2",
-            "data" -> Json.arr(
-              Json.obj("cls" -> "Variable", "name" -> "x", "value" -> 2)
+      TokenOf.guest match {
+        case Some(token) =>
+          val response = route(
+            app,
+            FakeRequest(
+              POST,
+              s"/api/push",
+              Headers("Content-Type" -> "application/json", "X-Auth-Token" -> token),
+              Json.obj(
+                "view" -> "test_view_2",
+                "data" -> Json.arr(
+                  Json.obj("cls" -> "Variable", "name" -> "x", "value" -> 2)
+                )
+              )
             )
-          )
-        )
-      )
-
-      status(response) mustBe UNAUTHORIZED
-      // check in memory
-      Memory.views.contains("test_view_2") mustBe false
+          ).get
+          status(response) mustBe UNAUTHORIZED
+          // check in memory
+          Memory.views.contains("test_view_2") mustBe false
+        case None =>
+      }
     }
 
     "push fail with no token" in {
-      val response = controller.push(
+      val response = route(
+        app,
         FakeRequest(
           POST,
           s"/api/push",
@@ -176,7 +168,7 @@ class ApiControllerSpec @Inject() (
             )
           )
         )
-      )
+      ).get
 
       status(response) mustBe UNAUTHORIZED
       // check in memory
@@ -185,19 +177,20 @@ class ApiControllerSpec @Inject() (
 
     "push fail with invalid body format" in {
       val token = TokenOf.admin
-      val response = controller.push(
+      val response = route(
+        app,
         FakeRequest(
           POST,
           s"/api/push",
           Headers("Content-Type" -> "application/json", "X-Auth-Token" -> token),
           Json.obj(
             "view" -> "test_view_4",
-            "data" -> Json.arr(
-              Json.obj("cls" -> "Variable", "name" -> "x", "value" -> 4)
-            )
+            "cls" -> "Variable",
+            "name" -> "x",
+            "value" -> 4
           )
         )
-      )
+      ).get
 
       status(response) mustBe BAD_REQUEST
       // check in memory
@@ -206,21 +199,23 @@ class ApiControllerSpec @Inject() (
   }
 
   object TokenOf {
-    def admin: String = getToken(sys.env.getOrElse("MITA_PASSWORD", "password"))
-    def guest: Option[String] =
+    lazy val admin: String = getToken(sys.env.getOrElse("MITA_PASSWORD", "password"))
+    lazy val guest: Option[String] =
       if (sys.env.getOrElse("MITA_GUEST_PASSWORD", "changeit") == "changeit") None
       else Some(getToken(sys.env.getOrElse("MITA_GUEST_PASSWORD", "changeit")))
 
     private def getToken(pw: String): String = {
-      val response = controller.auth(
+      val response = route(
+        app,
         FakeRequest(
           POST,
           s"/api/auth",
           Headers("Content-Type" -> "application/json"),
           Json.obj("password" -> pw)
         )
-      )
+      ).get
       (contentAsJson(response) \ "token").as[String]
     }
   }
+
 }
