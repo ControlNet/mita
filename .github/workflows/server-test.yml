@@ -52,3 +52,6 @@ jobs:
       - name: Wait for application
         working-directory: .github/integration-test
         run: scala-cli test . --server=false --java-opt "-Dapplication.port=${{ matrix.port }}"
+        env:
+          MITA_GUEST_PASSWORD: "234"
+          MITA_PASSWORD: "123456"

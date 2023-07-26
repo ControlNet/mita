@@ -16,7 +16,9 @@ export default function App() {
           <Route path="/*" element={<NotFound className="flex-auto" />} />
         </Routes>
       </BrowserRouter>
-      <MitaFooter />
+      <div className="sticky bottom-0 z-50">
+        <MitaFooter />
+      </div>
     </div>
   );
 }

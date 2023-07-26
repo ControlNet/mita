@@ -28,8 +28,7 @@ object FrontendRunHook {
         * not installed.
         */
       override def beforeStarted(): Unit = {
-        if (!(base / "ui" / "node_modules").exists())
-          Process(install, base / "ui").!
+        if (!(base / "ui" / "node_modules").exists()) Process(install, base / "ui").!
       }
 
       /** Executed after play run start. Run npm start

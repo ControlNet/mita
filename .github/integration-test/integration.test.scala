@@ -13,15 +13,9 @@ import org.scalatest.OptionValues
 import org.scalatest.concurrent.Eventually
 import scala.concurrent.duration._
 
-class IntegrationTestSuite
-    extends AnyWordSpec
-    with Matchers
-    with WebBrowser
-    with OptionValues
-    with Eventually {
+class IntegrationTestSuite extends AnyWordSpec with Matchers with WebBrowser with OptionValues with Eventually {
 
-  implicit override val patienceConfig =
-    PatienceConfig(timeout = 60.seconds, interval = 100.millis)
+  implicit override val patienceConfig = PatienceConfig(timeout = 60.seconds, interval = 100.millis)
 
   val chromeOptions: ChromeOptions = {
     val value = new ChromeOptions

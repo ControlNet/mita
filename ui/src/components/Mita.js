@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ThemeButton from "./ThemeButton";
 import DeleteButton from "./DeleteButton";
+import LogoutButton from "./LogoutButton";
 
 export default function Mita(props) {
   const [viewNames, setViewNames] = useState([]);
@@ -80,6 +81,10 @@ export default function Mita(props) {
     setModalVisible(!modalVisible);
   }
 
+  function onClickLogout() {
+    navigate("/login");
+  }
+
   return (
     <div className={props.className + " flex flex-col p-10"}>
       <div className="flex flex-row">
@@ -92,6 +97,7 @@ export default function Mita(props) {
         <div className="pl-4">
           <ThemeButton className="mr-2" />
           <DeleteButton className="mr-2" onClick={toggleVisible} />
+          <LogoutButton className="mr-2" onClick={onClickLogout} />
           <Modal open={modalVisible}>
             <Modal.Header className="font-bold">
               Confirm to delete all views?

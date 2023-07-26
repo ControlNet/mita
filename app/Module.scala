@@ -1,14 +1,7 @@
 import com.google.inject.{AbstractModule, Provides}
 import io.github.honeycombcheesecake.play.silhouette.api.repositories.AuthInfoRepository
-import io.github.honeycombcheesecake.play.silhouette.api.services.{
-  AuthenticatorService,
-  IdentityService
-}
-import io.github.honeycombcheesecake.play.silhouette.api.util.{
-  Clock,
-  PasswordHasher,
-  PasswordHasherRegistry
-}
+import io.github.honeycombcheesecake.play.silhouette.api.services.{AuthenticatorService, IdentityService}
+import io.github.honeycombcheesecake.play.silhouette.api.util.{Clock, PasswordHasher, PasswordHasherRegistry}
 import io.github.honeycombcheesecake.play.silhouette.api.{
   Environment,
   EventBus,
@@ -17,16 +10,10 @@ import io.github.honeycombcheesecake.play.silhouette.api.{
   SilhouetteProvider
 }
 import io.github.honeycombcheesecake.play.silhouette.impl.authenticators.JWTAuthenticator
-import io.github.honeycombcheesecake.play.silhouette.impl.providers.BasicAuthProvider
+import io.github.honeycombcheesecake.play.silhouette.impl.providers.{BasicAuthProvider, CredentialsProvider}
 import io.github.honeycombcheesecake.play.silhouette.password.BCryptSha256PasswordHasher
 import net.codingwell.scalaguice.ScalaModule
-import security.{
-  MitaAuthInfoRepository,
-  MitaAuthenticatorService,
-  MitaEnv,
-  User,
-  UserService
-}
+import security.{MitaAuthInfoRepository, MitaAuthenticatorService, MitaRequestProvider, MitaEnv, User, UserService}
 
 import scala.concurrent.ExecutionContext
 
@@ -63,17 +50,26 @@ class Module extends AbstractModule with ScalaModule {
   ): AuthenticatorService[JWTAuthenticator] = new MitaAuthenticatorService
 
   @Provides
+  def provideCredentialProvider(implicit
+      authInfoRepository: AuthInfoRepository,
+      passwordHasherRegistry: PasswordHasherRegistry,
+      ec: ExecutionContext
+  ): CredentialsProvider = new MitaRequestProvider(
+    authInfoRepository,
+    passwordHasherRegistry
+  )
+
+  @Provides
   def providePasswordHasherRegistry(implicit
       passwordHasher: PasswordHasher
-  ): PasswordHasherRegistry =
-    PasswordHasherRegistry(passwordHasher, Nil)
+  ): PasswordHasherRegistry = PasswordHasherRegistry(passwordHasher, Nil)
 
   @Provides
   def provideAuthProvider(implicit
       authInfoRepository: AuthInfoRepository,
       passwordHasherRegistry: PasswordHasherRegistry,
       ec: ExecutionContext
-  ): RequestProvider = new BasicAuthProvider(
+  ): RequestProvider = new MitaRequestProvider(
     authInfoRepository,
     passwordHasherRegistry
   )

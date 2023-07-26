@@ -44,7 +44,9 @@ export default function Login(props) {
     api.removeToken();
     const response = await api.auth(input);
     if (response.status === 200) {
-      api.setAuth((await response.json()).token);
+      const result = await response.json();
+      api.setAuth(result.token);
+      api.setRole(result.role);
       navigate("/");
     } else {
       setButtonStage("error");
