@@ -41,7 +41,16 @@ Install the client from pypi:
 pip install mita_client
 ```
 
-Use the client:
+Use the tqdm integrated client (require `tqdm` for progress bar):
+```python
+from mita_client import mita_tqdm
+import time
+
+for i in mita_tqdm(range(1000), ADDRESS, PASSWORD):
+    time.sleep(0.1)
+```
+
+Use the fully client:
 ```python
 from mita_client.client import Mita
 from mita_client.component import *
