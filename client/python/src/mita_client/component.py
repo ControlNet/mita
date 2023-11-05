@@ -26,7 +26,7 @@ class Variable(Component[T]):
 
 class ProgressBar(Component[Union[int, float]]):
 
-    def __init__(self, name: str, value: Union[int, float], total: Union[int, float] = 100):
+    def __init__(self, name: str, value: Union[int, float] = 0, total: Union[int, float] = 100):
         super().__init__("ProgressBar", name, value)
         self.total = total
 
