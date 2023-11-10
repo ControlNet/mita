@@ -1,3 +1,4 @@
+import os
 from typing import Optional, Union
 
 from tqdm.auto import tqdm as std_tqdm
@@ -14,8 +15,8 @@ class MitaTqdm(std_tqdm):
 
     Args:
         iterable: Iterable to decorate with a progressbar.
-        address (``str``): The address of the Mita server.
-        password (``str``): The password of the Mita server.
+        address (``str``, optional): The address of the Mita server. Default use ENV variable ``MITA_ADDRESS``.
+        password (``str``, optional): The password of the Mita server. Default use ENV variable ``MITA_PASSWORD``.
         view (``str`` | ``View``, optional): The view used for mita client. If the input is `str`, it will be used as
             the view name. Default name is the hostname.
         *args: Arguments passed to the wrapped `tqdm` instance.
@@ -39,6 +40,10 @@ class MitaTqdm(std_tqdm):
         verbose: bool = False, *args, **kwargs
     ):
         super().__init__(iterable, *args, **kwargs)
+        if "MITA_ADDRESS" in os.environ and address is None:
+            address = os.environ["MITA_ADDRESS"]
+        if "MITA_PASSWORD" in os.environ and password is None:
+            password = os.environ["MITA_PASSWORD"]
         assert address is not None and password is not None, "address and password must be specified."
         if view is None:
             view = View()
@@ -52,7 +57,7 @@ class MitaTqdm(std_tqdm):
 
         self.progress_bar = ProgressBar(self.desc, total=self.total or 1)
         view.add(self.progress_bar)
-        self.client = Mita(address, password, verbose=self.verbose)
+        self.client = Mita(address, password, verbose=verbose)
         self.client.add(view)
         self.client.__enter__()
 
