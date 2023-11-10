@@ -35,7 +35,8 @@ class MitaTqdm(std_tqdm):
     def __init__(self, iterable=None,
         address: Optional[str] = None,
         password: Optional[str] = None,
-        view: Optional[Union[str, View]] = None, *args, **kwargs
+        view: Optional[Union[str, View]] = None,
+        verbose: bool = False, *args, **kwargs
     ):
         super().__init__(iterable, *args, **kwargs)
         assert address is not None and password is not None, "address and password must be specified."
@@ -51,7 +52,7 @@ class MitaTqdm(std_tqdm):
 
         self.progress_bar = ProgressBar(self.desc, total=self.total or 1)
         view.add(self.progress_bar)
-        self.client = Mita(address, password, verbose=True)
+        self.client = Mita(address, password, verbose=self.verbose)
         self.client.add(view)
         self.client.__enter__()
 
