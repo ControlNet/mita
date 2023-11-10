@@ -19,6 +19,7 @@ class MitaTqdm(std_tqdm):
         password (``str``, optional): The password of the Mita server. Default use ENV variable ``MITA_PASSWORD``.
         view (``str`` | ``View``, optional): The view used for mita client. If the input is `str`, it will be used as
             the view name. Default name is the hostname.
+        verbose (``bool``, optional): Whether to print debug information. Default ``False``.
         *args: Arguments passed to the wrapped `tqdm` instance.
         **kwargs: Keyword arguments passed to the wrapped `tqdm` instance.
 
