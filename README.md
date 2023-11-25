@@ -5,6 +5,8 @@ Mita, named as Multi-Tangled, is a web application for monitoring runtime status
 
 Demo: [https://mita-demo.controlnet.space](https://mita-demo.controlnet.space)
 
+<img src=".github/demo.png" style="max-height: 480px">
+
 ## Get Started
 
 ### Run Server
