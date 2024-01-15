@@ -1,0 +1,43 @@
+name: Rust Client Test
+on:
+  workflow_call:
+
+jobs:
+  build-test:
+    name: Build Test
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
+
+      - name: Build
+        working-directory: ./client/rust
+        run: |
+          cargo build --verbose
+
+  unittest:
+    name: Build Test
+    runs-on: ubuntu-20.04
+    needs: ["build-test"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Rust Toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+            override: true
+
+      - name: Build
+        working-directory: ./client/rust
+        run: |
+          cargo test --verbose
