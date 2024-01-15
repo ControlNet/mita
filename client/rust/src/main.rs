@@ -1,4 +1,4 @@
-use mita_client::{HELLO};
+use mita::{HELLO};
 
 fn main() {
     println!("{}", HELLO);
