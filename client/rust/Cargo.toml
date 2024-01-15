@@ -4,7 +4,6 @@ version = "0.0.0"
 authors = ["ControlNet <smczx@hotmail.com>"]
 edition = "2021"
 license = "MIT"
-license-file = "LICENSE"
 description = "Mita client"
 homepage = "https://github.com/ControlNet/mita"
 repository = "https://github.com/ControlNet/mita"
