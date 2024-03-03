@@ -1,0 +1,13 @@
+[package]
+name = "mita"
+version = "0.0.0"
+authors = ["ControlNet <smczx@hotmail.com>"]
+edition = "2021"
+license = "MIT"
+description = "Mita client"
+homepage = "https://github.com/ControlNet/mita"
+repository = "https://github.com/ControlNet/mita"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]

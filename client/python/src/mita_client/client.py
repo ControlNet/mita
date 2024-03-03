@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import List
+import os
+from typing import List, Optional
 from urllib.error import URLError
 
 from .api import auth, MitaWorker, State
@@ -10,9 +11,11 @@ from .view import View
 
 class Mita:
 
-    def __init__(self, url: str, password: str, num_workers: int = 1, verbose: bool = False):
-        self.url = url
-        self.password = password
+    def __init__(self, url: Optional[str] = None, password: Optional[str] = None, num_workers: int = 1,
+        verbose: bool = False
+    ):
+        self.url = url or os.environ.get("MITA_ADDRESS")
+        self.password = password or os.environ.get("MITA_PASSWORD")
         self.views: List[View] = []
         self.worker = MitaWorker(url, self)
         self.num_workers = num_workers
@@ -43,3 +46,6 @@ class Mita:
     def push(self) -> None:
         for view in self.views:
             self.worker.put(view.to_dict())
+
+    def join(self):
+        self.worker.join()

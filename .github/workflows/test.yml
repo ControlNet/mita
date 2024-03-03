@@ -17,6 +17,11 @@ jobs:
     name: JS Client Test
     uses: ./.github/workflows/client-js-test.yml
 
+  client-rust-test:
+    name: Rust Client Test
+    uses: ./.github/workflows/client-rust-test.yml
+
   server-test:
     name: Server Test
     uses: ./.github/workflows/server-test.yml
+
