@@ -11,6 +11,7 @@ from time import sleep
 from urllib import request
 from urllib.error import HTTPError, URLError
 
+from ._version import version
 from .error import MitaAuthError
 
 if TYPE_CHECKING:
@@ -48,7 +49,10 @@ def auth(url: str, password: str) -> State:
     """
     try:
         data = str(json.dumps({"password": password})).encode("utf-8")
-        req = request.Request(f"{url}/api/auth", data=data, headers={"Content-Type": "application/json"})
+        req = request.Request(f"{url}/api/auth", data=data, headers={
+            "Content-Type": "application/json",
+            "User-Agent": f"mita_client_python/{version}"
+        })
         with request.urlopen(req) as f:
             set_token(json.loads(f.read())["token"])
         return State.SUCCESS
