@@ -48,9 +48,9 @@ class MitaTqdm(std_tqdm):
         assert address is not None and password is not None, "address and password must be specified."
         if view is None:
             view = View()
-        elif view is not None and isinstance(view, str):
+        elif isinstance(view, str):
             view = View(view)
-        elif view is not None and not isinstance(view, View):
+        elif not isinstance(view, View):
             raise TypeError("view must be either None, str or View.")
 
         if self.desc == "":
