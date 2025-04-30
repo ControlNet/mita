@@ -5,6 +5,8 @@ Mita, named as Multi-Tangled, is a web application for monitoring runtime status
 
 Demo: [https://mita-demo.controlnet.space](https://mita-demo.controlnet.space)
 
+<img src=".github/demo.png" style="max-height: 480px">
+
 ## Get Started
 
 ### Run Server
@@ -14,9 +16,13 @@ The server is used to accept client post data and host the web UI.
 #### Docker
 ```bash
 docker run \
+  -d \
   -p <PORT>:9000 \
   -e MITA_PASSWORD=<PASSWORD> \
   [-e MITA_GUEST_PASSWORD=<GUEST_PASSWORD>] \
+  -v <DATA_DIR>:/opt/target/universal/stage/data \
+  --name mita \
+  --restart=unless-stopped \
   controlnet/mita[:<VERSION>]
 ```
 
@@ -41,7 +47,16 @@ Install the client from pypi:
 pip install mita_client
 ```
 
-Use the client:
+Use the tqdm integrated client (require `tqdm` for progress bar):
+```python
+from mita_client import mita_tqdm
+import time
+
+for i in mita_tqdm(range(1000), ADDRESS, PASSWORD):
+    time.sleep(0.1)
+```
+
+Use the fully client:
 ```python
 from mita_client.client import Mita
 from mita_client.component import *
