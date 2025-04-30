@@ -2,15 +2,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import json
+import time
 import warnings
 from enum import Enum
 from functools import partial
 from queue import Queue
-from threading import Thread
+from threading import Thread, local
 from time import sleep
 from urllib import request
 from urllib.error import HTTPError, URLError
 
+from ._version import version
 from .error import MitaAuthError
 
 if TYPE_CHECKING:
@@ -26,12 +28,16 @@ class State(Enum):
     CONNECTION_ERROR = 2
 
 
-_token = ""
+# Use thread-local storage for token to ensure thread safety
+_thread_local = local()
 
 
 def set_token(token: str):
-    global _token
-    _token = token
+    _thread_local.token = token
+
+
+def get_token():
+    return getattr(_thread_local, 'token', "")
 
 
 # POST /api/auth
@@ -48,8 +54,11 @@ def auth(url: str, password: str) -> State:
     """
     try:
         data = str(json.dumps({"password": password})).encode("utf-8")
-        req = request.Request(f"{url}/api/auth", data=data, headers={"Content-Type": "application/json"})
-        with request.urlopen(req) as f:
+        req = request.Request(f"{url}/api/auth", data=data, headers={
+            "Content-Type": "application/json",
+            "User-Agent": f"mita_client_python/{version}"
+        })
+        with request.urlopen(req, timeout=30) as f:
             set_token(json.loads(f.read())["token"])
         return State.SUCCESS
     except HTTPError:
@@ -74,9 +83,9 @@ def push(url: str, data: dict) -> State:
         data = str(json.dumps(data)).encode("utf-8")
         req = request.Request(f"{url}/api/push", data=data, headers={
             "Content-Type": "application/json",
-            "X-Auth-Token": _token
+            "X-Auth-Token": get_token()
         })
-        with request.urlopen(req) as f:
+        with request.urlopen(req, timeout=30) as f:
             f.read()
         return State.SUCCESS
     except HTTPError:
@@ -88,7 +97,6 @@ def push(url: str, data: dict) -> State:
 class MitaWorker:
 
     def __init__(self, url: str, client: Mita):
-        super().__init__()
         self.client = client
         self.push = partial(push, url)
         self.data = Queue()  # queue of dict
@@ -124,7 +132,6 @@ class MitaWorker:
                     continue
 
             d = self.data.get()
-            import time
             t0 = time.time()
             state = self.push(d)
             if state == State.CONNECTION_ERROR:

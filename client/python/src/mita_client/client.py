@@ -17,7 +17,7 @@ class Mita:
         self.url = url or os.environ.get("MITA_ADDRESS")
         self.password = password or os.environ.get("MITA_PASSWORD")
         self.views: List[View] = []
-        self.worker = MitaWorker(url, self)
+        self.worker = MitaWorker(self.url, self)
         self.num_workers = num_workers
         self.verbose = verbose
 

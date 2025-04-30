@@ -10,7 +10,7 @@ on:
 jobs:
   check-version:
     name: Check Version
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       local-version: ${{ steps.get-local-version.outputs.version }}
       remote-version: ${{ steps.get-remote-version.outputs.version }}
@@ -46,7 +46,7 @@ jobs:
 
   release:
     name: Release
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [ "test" ]
 
     steps:

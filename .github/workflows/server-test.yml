@@ -6,7 +6,7 @@ on:
 jobs:
   check-code-style:
     name: Code Style
-    uses: playframework/.github/.github/workflows/sbt.yml@v1
+    uses: ./.github/workflows/sbt.yml
     with:
       cmd: sbt validateCode
 
@@ -14,7 +14,7 @@ jobs:
     name: Unittest
     needs: # Waiting more lightweight checks
       - "check-code-style"
-    uses: playframework/.github/.github/workflows/sbt.yml@v1
+    uses: ./.github/workflows/sbt.yml
     with:
       cmd: sbt test
 
@@ -31,7 +31,7 @@ jobs:
     name: Integration / ${{ matrix.mode }}
     needs:
       - "unittest"
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
