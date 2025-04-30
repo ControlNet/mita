@@ -16,9 +16,13 @@ The server is used to accept client post data and host the web UI.
 #### Docker
 ```bash
 docker run \
+  -d \
   -p <PORT>:9000 \
   -e MITA_PASSWORD=<PASSWORD> \
   [-e MITA_GUEST_PASSWORD=<GUEST_PASSWORD>] \
+  -v <DATA_DIR>:/opt/target/universal/stage/data \
+  --name mita \
+  --restart=unless-stopped \
   controlnet/mita[:<VERSION>]
 ```
 
