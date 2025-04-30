@@ -47,7 +47,7 @@ jobs:
         uses: coursier/cache-action@v6.3
 
       - name: Custom Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         if: ${{ inputs.cache-key != '' && inputs.cache-path != '' }}
         with:
           key: ${{ inputs.cache-key }}
