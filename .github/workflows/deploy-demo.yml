@@ -7,7 +7,7 @@ on:
 jobs:
   deploy-demo:
     name: Deploy Demo
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -47,4 +47,3 @@ jobs:
           npm run deploy
         env:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-

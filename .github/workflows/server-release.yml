@@ -12,7 +12,7 @@ on:
 jobs:
   check-version:
     name: Check Version
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       local-version: ${{ steps.get-local-version.outputs.version }}
       remote-version: ${{ steps.get-remote-version.outputs.version }}
@@ -45,7 +45,7 @@ jobs:
   dockerhub-release:
     name: Dockerhub Release
     needs: [ "test" ]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -77,7 +77,7 @@ jobs:
   github-release:
     name: GitHub Release
     needs: [ "test" ]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout

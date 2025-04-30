@@ -5,7 +5,7 @@ on:
 jobs:
   build-test:
     name: Build Test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     strategy:
       fail-fast: false
@@ -36,7 +36,7 @@ jobs:
 
   import-test:
     name: Import Test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: ["build-test"]
 
     strategy:
@@ -68,7 +68,7 @@ jobs:
 
   unittest:
     name: Unittest
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: ["import-test"]
 
     strategy:
