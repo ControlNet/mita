@@ -6,7 +6,7 @@ on:
 jobs:
   check-code-style:
     name: Code Style
-    uses: playframework/.github/.github/workflows/cmd.yml@v3
+    uses: ./.github/workflows/sbt.yml
     with:
       cmd: sbt validateCode
 
@@ -14,7 +14,7 @@ jobs:
     name: Unittest
     needs: # Waiting more lightweight checks
       - "check-code-style"
-    uses: playframework/.github/.github/workflows/cmd.yml@v3
+    uses: ./.github/workflows/sbt.yml
     with:
       cmd: sbt test
 
