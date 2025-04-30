@@ -20,7 +20,7 @@ docker run \
   -p <PORT>:9000 \
   -e MITA_PASSWORD=<PASSWORD> \
   [-e MITA_GUEST_PASSWORD=<GUEST_PASSWORD>] \
-  -v <DATA_DIR>:/opt/target/universal/stage/data \
+  -v <DATA_DIR>:/app/data \
   --name mita \
   --restart=unless-stopped \
   controlnet/mita[:<VERSION>]
