@@ -46,14 +46,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: "3.12"
           architecture: x64
 
       - name: Install dependencies
         working-directory: ./client/python
         run: |
           pip install -r requirements.txt
-          pip install wheel
+          pip install wheel setuptools
           python init.py
           cp ../../README.md .
 

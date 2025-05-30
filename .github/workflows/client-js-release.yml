@@ -18,10 +18,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Use Node.js 14
+      - name: Use Node.js 22
         uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 22
 
       - name: Use Python 3.10
         uses: actions/setup-python@v4
@@ -53,10 +53,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Use Node.js 14
+      - name: Use Node.js 22
         uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 22
 
       - name: Install dependencies
         working-directory: ./client/js
