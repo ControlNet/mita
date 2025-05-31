@@ -37,4 +37,8 @@ impl View {
             "data": self.data,   // 组件本身已实现 Serialize
         })
     }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
 }

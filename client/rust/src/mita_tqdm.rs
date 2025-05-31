@@ -8,6 +8,7 @@ use crate::{
     view::View,
     client::MitaClient,
 };
+use crate::error::MitaError;
 
 /// A wrapper around an `Iterator` that:
 /// 1) shows an `indicatif` progress bar locally
@@ -49,7 +50,7 @@ where
         password: Option<String>,
         view: Option<View>,
         verbose: bool,
-    ) -> Self {
+    ) -> Result<Self,MitaError> {
         // ---------- resolve address/password ----------
         let address = address
             .or_else(|| env::var("MITA_ADDRESS").ok())
@@ -68,7 +69,7 @@ where
         bar.set_message("Progress");
 
         // ---------- remote progress component ----------
-        let mut progress =
+        let progress =
             crate::components::progress_bar::ProgressBar::new(
                 bar.message().to_string(), 0.0, upper as f64);
 
@@ -78,23 +79,23 @@ where
                 .unwrap_or_default()
                 .to_string_lossy()
                 .into_owned(),
-            Some(v) => v.name().clone(),
+            Some(v) => v.name().into(),
         };
 
         // -- create client (single worker, queue 64) and push initial bar --
         let client = MitaClient::new(
-            &address, &password, 1, 64, verbose);
+            Some(&address), Some(&password), Some(1), Some(64), verbose)?;
         // Push a temp view to refresh the server side model
         push_once(&client, &view_name, &progress).ok();
 
-        Self {
+        Ok(Self {
             inner: iter,
             bar,
             client,
             progress_comp: progress,
             view_name,
             displayed_last: false,
-        }
+        })
     }
 }
 
@@ -133,6 +134,6 @@ fn push_once(
     comp: &crate::components::progress_bar::ProgressBar,
 ) -> Result<(), crate::error::MitaError> {
     let mut v = View::new(Some(view_name.to_owned()));
-    v.add([Component::from(comp.clone())]);
+    v.add([Component::from((*comp).clone())]);
     cli.add(&v)
 }

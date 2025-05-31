@@ -10,7 +10,6 @@ use serde_json::to_value;
 pub struct MitaClient {
     // Option, sot that it would be easy to be removed from `Drop` by `take()`
     worker: Option<MitaWorker>,
-    verbose: bool,
 }
 
 impl MitaClient {
@@ -45,7 +44,6 @@ impl MitaClient {
         let worker = MitaWorker::new(url, password, threads, queue_cap, verbose);
         Ok(Self {
             worker: Some(worker),
-            verbose,
         })
     }
 
@@ -64,7 +62,7 @@ impl MitaClient {
             .as_ref()
             .expect("Error: worker already dropped")
             .submit(payload)
-            .map_err(|_| MitaError::Net("Network Error: queue closed".into()))
+            .map_err(|_| MitaError::QueueClosed)
     }
 
     /// Wait explicitly for all background tasks to end (optional)

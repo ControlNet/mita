@@ -1,5 +1,5 @@
-use mita::{HELLO};
+
 
 fn main() {
-    println!("{}", HELLO);
+    println!("{}", "Hello, world!");
 }

@@ -30,6 +30,8 @@ impl MitaWorker {
         verbose: bool,
     ) -> Self {
         let (tx, rx) = bounded::<Payload>(queue_cap);
+        let url = api_url.into();
+        let pwd = password.into();
         let stop_flag = Arc::new(AtomicBool::new(false));
 
         let mut handles = Vec::with_capacity(threads);
@@ -37,8 +39,8 @@ impl MitaWorker {
             handles.push(Self::spawn_one(
                 rx.clone(),
                 stop_flag.clone(),
-                api_url.clone().into(),
-                password.clone().into(),
+                url.clone(),
+                pwd.clone(),
                 verbose,
             ));
         }
@@ -59,7 +61,7 @@ impl MitaWorker {
     /// wait for the threads to leave)
     pub fn stop(&self) {
         self.stop_flag.store(true, Ordering::SeqCst);
-        let _ = self.tx.close(); // Close all senders and make recv to return Err immediately
+        let _ = drop(self.tx.clone()); // Close all senders and make recv to return Err immediately
     }
 
     /// Blocking to wait for all background threads to leave
@@ -79,7 +81,7 @@ impl MitaWorker {
         verbose: bool,
     ) -> JoinHandle<()> {
         thread::spawn(move || {
-            let mut api = Api::new(url);
+            let api = Api::new(url);
 
             // First login (Blocking retries)
             while api.auth(&password).is_err() {
@@ -110,6 +112,12 @@ impl MitaWorker {
                             }
                             Err(MitaError::Net(e)) => {
                                 eprintln!("[MitaWorker] connection error: {e}");
+                            }
+                            Err(MitaError::Config(reason)) => {
+                                eprintln!("[MitaWorker] config error: {reason}");
+                            }
+                            Err(MitaError::QueueClosed) => {
+                                eprintln!("[MitaWorker] queue closed");
                             }
                         }
                     }

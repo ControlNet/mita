@@ -6,6 +6,8 @@ pub enum MitaError {
     Config(String),
     #[error("auth failed")]
     Auth,
+    #[error("queue closed")]
+    QueueClosed,
     #[error("network error: {0}")]
     Net(#[from] reqwest::Error),
 }
