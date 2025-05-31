@@ -49,6 +49,14 @@ impl MitaClient {
         })
     }
 
+    pub fn init(
+        url: impl Into<String>,
+        password: impl Into<String>,
+        verbose: bool
+    ) -> Result<Self, MitaError> {
+        Self::new(Some(url), Some(password), None, None, verbose)
+    }
+
     /// Add view into the sending query
     pub fn add(&self, view: &View) -> Result<(), MitaError> {
         let payload: Payload = to_value(view).expect("Error: view must be serializable");
