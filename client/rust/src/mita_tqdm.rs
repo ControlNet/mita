@@ -1,5 +1,3 @@
-#![cfg(feature = "progress")]
-
 use indicatif::{ProgressBar as IndicatifBar, ProgressStyle};
 use std::env;
 

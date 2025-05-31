@@ -5,7 +5,7 @@ use crate::error::MitaError;
 use crate::MITA_VERSION;
 
 thread_local! {
-    static TOKEN: RefCell<Option<String>> = RefCell::new(None);
+    static TOKEN: RefCell<Option<String>> = const { RefCell::new(None) };
 }
 
 fn set_token(tok: String) {

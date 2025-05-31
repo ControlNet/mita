@@ -61,7 +61,7 @@ impl MitaWorker {
     /// wait for the threads to leave)
     pub fn stop(&self) {
         self.stop_flag.store(true, Ordering::SeqCst);
-        let _ = drop(self.tx.clone()); // Close all senders and make recv to return Err immediately
+        drop(self.tx.clone()); // Close all senders and make recv to return Err immediately
     }
 
     /// Blocking to wait for all background threads to leave
