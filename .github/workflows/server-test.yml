@@ -4,19 +4,27 @@ on:
   workflow_call:
 
 jobs:
-  check-code-style:
+  code-style:
     name: Code Style
     uses: ./.github/workflows/sbt.yml
     with:
       cmd: sbt validateCode
+      cache-key: sbt-cache-${{ github.sha }}
+      cache-path: |
+        ~/.sbt
+        ~/.ivy2/cache
 
   unittest:
-    name: Unittest
-    needs: # Waiting more lightweight checks
-      - "check-code-style"
+    name: Unit Test
+    needs:
+      - "code-style"
     uses: ./.github/workflows/sbt.yml
     with:
       cmd: sbt test
+      cache-key: sbt-cache-${{ github.sha }}
+      cache-path: |
+        ~/.sbt
+        ~/.ivy2/cache
 
   integration-test:
     strategy:
@@ -39,7 +47,13 @@ jobs:
           fetch-depth: 0
 
       - name: Build docker image
-        run: docker build -f .github/integration-test/Dockerfile-${{ matrix.mode }} -t mita .
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: .github/integration-test/Dockerfile-${{ matrix.mode }}
+          tags: mita
+          load: true
+          push: false
 
       - name: Run docker image
         run: docker run -p ${{ matrix.port }}:${{ matrix.port }} -d mita

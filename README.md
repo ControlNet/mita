@@ -1,5 +1,21 @@
 # Mita
 
+<div align="center">
+    <img src="https://img.shields.io/github/stars/ControlNet/mita?style=flat-square">
+    <img src="https://img.shields.io/github/forks/ControlNet/mita?style=flat-square">
+    <a href="https://github.com/ControlNet/mita/issues"><img src="https://img.shields.io/github/issues/ControlNet/mita?style=flat-square"></a>
+    <img src="https://img.shields.io/github/license/ControlNet/mita?style=flat-square">
+</div>
+
+<div align="center">
+    <a href="https://hub.docker.com/r/controlnet/mita">
+        <img src="https://img.shields.io/docker/image-size/controlnet/mita?style=flat-square&logo=docker&label=Docker">
+    </a>
+    <a href="https://pypi.org/project/mita_client/">
+        <img src="https://img.shields.io/pypi/v/mita_client?style=flat-square&logo=python&label=Python">
+    </a>
+</div>
+
 Mita, named as Multi-Tangled, is a web application for monitoring runtime status and data of multiple machines 
 (clients).
 
