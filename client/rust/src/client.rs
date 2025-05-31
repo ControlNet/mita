@@ -1,7 +1,7 @@
 //! client.rs —— End-user API that only exposes useful methods
 use crate::{
     error::MitaError,
-    view::View,             // View, derived from Serialize
+    view::View, // View, derived from Serialize
     worker::{MitaWorker, Payload},
 };
 use serde_json::to_value;
@@ -21,9 +21,9 @@ impl MitaClient {
     pub fn new(
         url: Option<impl Into<String>>,
         password: Option<impl Into<String>>,
-        threads: Option<usize>,       // 默认为 1
-        queue_cap: Option<usize>,     // 默认为 256
-        verbose: bool,                // 和 Python 一致：默认 false
+        threads: Option<usize>,   // 默认为 1
+        queue_cap: Option<usize>, // 默认为 256
+        verbose: bool,            // 和 Python 一致：默认 false
     ) -> Result<Self, MitaError> {
         // ---------- 1. Parse URL / PASSWORD ----------
         let url = url
@@ -50,7 +50,7 @@ impl MitaClient {
     pub fn init(
         url: impl Into<String>,
         password: impl Into<String>,
-        verbose: bool
+        verbose: bool,
     ) -> Result<Self, MitaError> {
         Self::new(Some(url), Some(password), None, None, verbose)
     }

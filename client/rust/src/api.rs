@@ -1,8 +1,8 @@
+use crate::error::MitaError;
+use crate::MITA_VERSION;
 use reqwest::blocking::Client;
 use serde_json::json;
 use std::cell::RefCell;
-use crate::error::MitaError;
-use crate::MITA_VERSION;
 
 thread_local! {
     static TOKEN: RefCell<Option<String>> = const { RefCell::new(None) };
@@ -71,7 +71,11 @@ impl Api {
 }
 
 // Compatibility with Python CLI's state
-pub enum State { Success, AuthError, ConnectionError }
+pub enum State {
+    Success,
+    AuthError,
+    ConnectionError,
+}
 
 impl From<Result<(), MitaError>> for State {
     fn from(r: Result<(), MitaError>) -> Self {

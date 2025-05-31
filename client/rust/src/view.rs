@@ -1,6 +1,6 @@
-use serde::Serialize;   // 假设已在 Cargo.toml 启用 serde + derive
-use std::iter::IntoIterator;
 use crate::components::Component;
+use serde::Serialize; // 假设已在 Cargo.toml 启用 serde + derive
+use std::iter::IntoIterator;
 
 #[derive(Serialize)]
 pub struct View {
@@ -12,9 +12,7 @@ impl View {
     pub fn new(name: Option<impl Into<String>>) -> Self {
         let name = name
             .map(Into::into)
-            .unwrap_or_else(|| {
-                hostname::get().unwrap_or_default().to_string_lossy().into()
-            });
+            .unwrap_or_else(|| hostname::get().unwrap_or_default().to_string_lossy().into());
         Self {
             name,
             data: Vec::new(),

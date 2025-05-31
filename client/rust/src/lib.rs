@@ -1,18 +1,15 @@
 mod api;
-mod worker;
 mod client;
 mod components;
 mod error;
 #[cfg(feature = "progress")]
 mod mita_tqdm;
 mod view;
+mod worker;
 
 pub use client::MitaClient as Mita;
 pub use components::{
-    line_chart::LineChart,
-    logger::Logger,
-    progress_bar::ProgressBar,
-    variable::Variable,
+    line_chart::LineChart, logger::Logger, progress_bar::ProgressBar, variable::Variable,
 };
 
 pub use view::View;
@@ -21,4 +18,4 @@ pub use view::View;
 pub const MITA_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[cfg(feature = "progress")]
-pub use mita_tqdm::MitaTqdm as MitaTqdm;
+pub use mita_tqdm::MitaTqdm;

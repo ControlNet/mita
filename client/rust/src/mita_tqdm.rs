@@ -1,12 +1,8 @@
 use indicatif::{ProgressBar as IndicatifBar, ProgressStyle};
 use std::env;
 
-use crate::{
-    components::Component,
-    view::View,
-    client::MitaClient,
-};
 use crate::error::MitaError;
+use crate::{client::MitaClient, components::Component, view::View};
 
 /// A wrapper around an `Iterator` that:
 /// 1) shows an `indicatif` progress bar locally
@@ -48,7 +44,7 @@ where
         password: Option<String>,
         view: Option<View>,
         verbose: bool,
-    ) -> Result<Self,MitaError> {
+    ) -> Result<Self, MitaError> {
         // ---------- resolve address/password ----------
         let address = address
             .or_else(|| env::var("MITA_ADDRESS").ok())
@@ -67,9 +63,11 @@ where
         bar.set_message("Progress");
 
         // ---------- remote progress component ----------
-        let progress =
-            crate::components::progress_bar::ProgressBar::new(
-                bar.message().to_string(), 0.0, upper as f64);
+        let progress = crate::components::progress_bar::ProgressBar::new(
+            bar.message().to_string(),
+            0.0,
+            upper as f64,
+        );
 
         // resolve view / view name
         let view_name = match &view {
@@ -81,8 +79,7 @@ where
         };
 
         // -- create client (single worker, queue 64) and push initial bar --
-        let client = MitaClient::new(
-            Some(&address), Some(&password), Some(1), Some(64), verbose)?;
+        let client = MitaClient::new(Some(&address), Some(&password), Some(1), Some(64), verbose)?;
         // Push a temp view to refresh the server side model
         push_once(&client, &view_name, &progress).ok();
 
@@ -118,7 +115,8 @@ where
         } else {
             // Stop iteration
             self.bar.finish();
-            self.progress_comp.set(self.bar.length().unwrap_or(0) as f64);
+            self.progress_comp
+                .set(self.bar.length().unwrap_or(0) as f64);
             let _ = push_once(&self.client, &self.view_name, &self.progress_comp);
         }
         next_item

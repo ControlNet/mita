@@ -3,7 +3,7 @@ use serde::Serialize;
 #[derive(Serialize)]
 pub struct Variable {
     name: String,
-    value: serde_json::Value,            // Any JSON format, could be int/float/str…
+    value: serde_json::Value, // Any JSON format, could be int/float/str…
 }
 
 impl Variable {
