@@ -3,8 +3,8 @@ use std::time;
 use mita::{LineChart, Logger, Mita, ProgressBar, Variable, View};
 use mita::Component;
 
-const ADDRESS: &str = env!("MITA_ADDRESS");
-const PASSWORD: &str = env!("MITA_PASSWORD");
+const ADDRESS: &str = "http://your.mita.server:9000/";
+const PASSWORD: &str = "some_mita_password";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
 
