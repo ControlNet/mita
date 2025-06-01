@@ -12,6 +12,8 @@ pub use components::{
     line_chart::LineChart, logger::Logger, progress_bar::ProgressBar, variable::Variable,
 };
 
+pub use components::common::Component;
+
 pub use view::View;
 
 /// similar to __version__ inside setup.py —— written to code

@@ -1,13 +1,13 @@
 use serde::Serialize;
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct Point {
     x: f64,
     y: f64,
     label: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct LineChart {
     name: String,
     value: Vec<Point>,

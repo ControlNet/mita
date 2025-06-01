@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct Variable {
     name: String,
     value: serde_json::Value, // Any JSON format, could be int/float/str…

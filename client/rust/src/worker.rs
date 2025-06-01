@@ -90,38 +90,34 @@ impl MitaWorker {
             }
 
             // Main loop
-            while !stop.load(Ordering::Relaxed) {
-                match rx.recv() {
-                    Ok(payload) => {
-                        let t0 = Instant::now();
-                        match api.push(&payload) {
-                            Ok(()) => {
-                                if verbose {
-                                    println!(
-                                        "[MitaWorker] pushed in {:.3}s",
-                                        t0.elapsed().as_secs_f64()
-                                    );
-                                }
-                            }
-                            Err(MitaError::Auth) => {
-                                if api.auth(&password).is_ok() {
-                                    let _ = api.push(&payload);
-                                } else {
-                                    eprintln!("[MitaWorker] auth retry failed");
-                                }
-                            }
-                            Err(MitaError::Net(e)) => {
-                                eprintln!("[MitaWorker] connection error: {e}");
-                            }
-                            Err(MitaError::Config(reason)) => {
-                                eprintln!("[MitaWorker] config error: {reason}");
-                            }
-                            Err(MitaError::QueueClosed) => {
-                                eprintln!("[MitaWorker] queue closed");
-                            }
+            while let Ok(payload) = rx.recv() {
+                println!("[MitaWorker] received payload = {}", payload);
+                let t0 = Instant::now();
+                match api.push(&payload) {
+                    Ok(()) => {
+                        if verbose {
+                            println!(
+                                "[MitaWorker] pushed in {:.3}s",
+                                t0.elapsed().as_secs_f64()
+                            );
                         }
                     }
-                    Err(_) => break, // All senders are closed, exit
+                    Err(MitaError::Auth) => {
+                        if api.auth(&password).is_ok() {
+                            let _ = api.push(&payload);
+                        } else {
+                            eprintln!("[MitaWorker] auth retry failed");
+                        }
+                    }
+                    Err(MitaError::Net(e)) => {
+                        eprintln!("[MitaWorker] connection error: {e}");
+                    }
+                    Err(MitaError::Config(reason)) => {
+                        eprintln!("[MitaWorker] config error: {reason}");
+                    }
+                    Err(MitaError::QueueClosed) => {
+                        eprintln!("[MitaWorker] queue closed");
+                    }
                 }
             }
         })

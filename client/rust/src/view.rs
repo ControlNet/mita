@@ -4,17 +4,17 @@ use std::iter::IntoIterator;
 
 #[derive(Serialize)]
 pub struct View {
-    name: String,
+    view: String,
     data: Vec<Component>,
 }
 
 impl View {
     pub fn new(name: Option<impl Into<String>>) -> Self {
-        let name = name
+        let view = name
             .map(Into::into)
             .unwrap_or_else(|| hostname::get().unwrap_or_default().to_string_lossy().into());
         Self {
-            name,
+            view,
             data: Vec::new(),
         }
     }
@@ -31,12 +31,12 @@ impl View {
     /// 序列化成等价的 Python dict 结构
     pub fn to_json(&self) -> serde_json::Value {
         serde_json::json!({
-            "view": self.name,
+            "view": self.view,
             "data": self.data,   // 组件本身已实现 Serialize
         })
     }
 
     pub fn name(&self) -> &str {
-        &self.name
+        &self.view
     }
 }
