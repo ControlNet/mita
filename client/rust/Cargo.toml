@@ -18,16 +18,16 @@ reqwest      = { version = "0.12", default-features = false, features = ["json",
 thiserror    = "1"
 hostname     = "0"
 
-# 可选
+# Optional
 indicatif    = { version = "0.17", optional = true }
 tracing      = { version = "0.1", features = ["log"], optional = true }
 
 [features]
 default = ["blocking"]
-blocking = []              # 显式列出，避免误开 async
-progress = ["indicatif"]   # 开关式进度条
+blocking = []              # explicitly list to avoid accidentally enabling async
+progress = ["indicatif"]   # switchable progress bar
 log = ["tracing"]
-#async = ["reqwest/async", "tokio", "tracing"]   # 若未来需要
+#async = ["reqwest/async", "tokio", "tracing"]   # if needed in the future
 
 [dev-dependencies]
 #tokio = { version = "1", features = ["rt-multi-thread", "macros"], optional = true }

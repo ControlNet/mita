@@ -71,7 +71,7 @@ impl MitaWorker {
         }
     }
 
-    /* ---------- 内部 ---------- */
+    /* ---------- Internal ---------- */
 
     fn spawn_one(
         rx: Receiver<Payload>,
