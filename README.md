@@ -54,7 +54,7 @@ docker run \
 
 The client is the interface to post data to the server.
 
-Now the python client is available. The other clients (nodejs, java, cli, ...) are in plan.
+A Python client and a Rust CLI are included in this repository.
 
 #### Python Client
 
@@ -106,9 +106,33 @@ with Mita(ADDRESS, PASSWORD) as client:
         client.push()
 ```
 
+#### Rust CLI
+
+Build the Rust CLI from source:
+
+```bash
+cargo build --manifest-path client/rust/Cargo.toml --release
+```
+
+Authenticate with a Mita server:
+
+```bash
+mita auth --url http://your.mita.server:9000 --password <PASSWORD>
+```
+
+Tokens are stored in `~/.mita.json` per server URL.
+
+Push updates (falls back to `MITA_ADDRESS` and `MITA_PASSWORD` when flags are omitted):
+
+```bash
+mita push progress_bar progress 20 --total 100
+mita push --view my_view variable some_var "Hello World"
+```
+
 ## License
 
 | Module | License                        |
 |--------|--------------------------------|
 | server | [AGPL](./LICENSE)              |
-| client | [MIT](./client/python/LICENSE) |
+| python client | [MIT](./client/python/LICENSE) |
+| rust client | [MIT](./client/rust/LICENSE) |

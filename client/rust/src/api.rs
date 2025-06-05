@@ -8,10 +8,10 @@ thread_local! {
     static TOKEN: RefCell<Option<String>> = const { RefCell::new(None) };
 }
 
-fn set_token(tok: String) {
+pub fn set_token(tok: String) {
     TOKEN.with(|t| *t.borrow_mut() = Some(tok));
 }
-fn get_token() -> Option<String> {
+pub fn get_token() -> Option<String> {
     TOKEN.with(|t| t.borrow().clone())
 }
 
@@ -32,7 +32,7 @@ impl Api {
         }
     }
 
-    pub fn auth(&self, password: &str) -> Result<(), MitaError> {
+    pub fn auth_token(&self, password: &str) -> Result<String, MitaError> {
         let resp = self
             .http
             .post(format!("{}/api/auth", self.url_base))
@@ -40,15 +40,20 @@ impl Api {
             .send()?;
 
         if resp.status().is_success() {
-            let tok = resp.json::<serde_json::Value>()?["token"]
+            let tok = resp
+                .json::<serde_json::Value>()?["token"]
                 .as_str()
                 .ok_or(MitaError::Auth)?
                 .to_owned();
-            set_token(tok);
-            Ok(())
+            set_token(tok.clone());
+            Ok(tok)
         } else {
             Err(MitaError::Auth)
         }
+    }
+
+    pub fn auth(&self, password: &str) -> Result<(), MitaError> {
+        self.auth_token(password).map(|_| ())
     }
 
     pub fn push<T: serde::Serialize>(&self, payload: &T) -> Result<(), MitaError> {
