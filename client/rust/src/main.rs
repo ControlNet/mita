@@ -1,51 +1,188 @@
-use std::thread::sleep;
-use std::time;
-use mita::{LineChart, Logger, Mita, ProgressBar, Variable, View};
-use mita::Component;
+use clap::{Parser, Subcommand, Args};
+use std::collections::HashMap;
+use std::fs;
+use std::path::PathBuf;
+use mita::{Api, View, Variable, ProgressBar, Logger, LineChart, Component, MitaError};
 
-const ADDRESS: &str = "http://your.mita.server:9000/";
-const PASSWORD: &str = "some_mita_password";
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-
-    let mut view = View::new(Some("rust_view"));
-    let mut logger = Logger::new("rust_logger");
-    let mut line_chart = LineChart::new("rust_line_chart", "x", "y");
-    let mut progress_bar = ProgressBar::new("rust_progress_bar", 0.0, 100.0);
-    let mut var = Variable::new("rust_var", 0.0);
-
-    let components: Vec<Component> = vec![
-        var.clone().into(), progress_bar.clone().into(), logger.clone().into(), line_chart.clone().into()
-    ];
-
-    view.add(components);
-
-
-    let client = Mita::init(ADDRESS, PASSWORD, true)?;
-
-    client.add(&view)?;
-
-    for i in 0..10 {
-        sleep(time::Duration::from_millis(1000));
-
-        logger.log(&format!("some msg {}", i));
-        line_chart.add(1.0 + i as f64, 1.0 + i as f64, "pos");
-        line_chart.add(1.0 + i as f64, 3.5 - i as f64, "neg");
-        progress_bar.set(i as f64 * 8.0 + 1.0);
-        var.set(i as f64 * 10.0);
-
-
-        let current_components: Vec<Component> = vec![
-            var.clone().into(), progress_bar.clone().into(), logger.clone().into(), line_chart.clone().into()
-        ];
-
-        view.add(current_components);
-
-        client.add(&view)?;
-    }
-
-    println!("Process finished.");
-
-    Ok(())
+#[derive(Parser)]
+#[command(name = "mita", about = "CLI for Mita Rust client")]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
 }
 
+#[derive(Subcommand)]
+enum Commands {
+    /// Authenticate and store token
+    Auth(AuthOpts),
+    /// Push a single component update
+    Push(PushOpts),
+}
+
+#[derive(Args)]
+struct AuthOpts {
+    #[arg(long)]
+    url: Option<String>,
+    #[arg(long)]
+    password: Option<String>,
+}
+
+#[derive(Args)]
+struct PushOpts {
+    #[arg(long)]
+    view: Option<String>,
+    #[arg(long)]
+    url: Option<String>,
+    #[arg(long)]
+    password: Option<String>,
+    component_type: String,
+    component_name: String,
+    component_value: String,
+    #[arg(long)]
+    total: Option<f64>,
+}
+
+fn token_file() -> PathBuf {
+    let base = match dirs::home_dir() {
+        Some(dir) => dir,
+        None => {
+            eprintln!("Home directory not found, using current directory for token file");
+            PathBuf::from(".")
+        }
+    };
+    base.join(".mita.json")
+}
+
+fn load_tokens() -> HashMap<String, String> {
+    let path = token_file();
+    if let Ok(s) = fs::read_to_string(path) {
+        serde_json::from_str(&s).unwrap_or_default()
+    } else {
+        HashMap::new()
+    }
+}
+
+fn save_tokens(map: &HashMap<String, String>) {
+    let path = token_file();
+    if let Ok(s) = serde_json::to_string(map) {
+        let _ = fs::write(path, s);
+    }
+}
+
+fn main() {
+    let cli = Cli::parse();
+    match cli.command {
+        Commands::Auth(opts) => cmd_auth(opts),
+        Commands::Push(opts) => cmd_push(opts),
+    }
+}
+
+fn resolve_url(arg: Option<String>) -> String {
+    arg.or_else(|| std::env::var("MITA_ADDRESS").ok())
+        .expect("MITA_ADDRESS not set")
+}
+
+fn resolve_pwd(arg: Option<String>) -> String {
+    arg.or_else(|| std::env::var("MITA_PASSWORD").ok())
+        .expect("MITA_PASSWORD not set")
+}
+
+fn cmd_auth(opts: AuthOpts) {
+    let url = resolve_url(opts.url);
+    let password = resolve_pwd(opts.password);
+    let api = Api::new(&url);
+    match api.auth_token(&password) {
+        Ok(tok) => {
+            let mut tokens = load_tokens();
+            tokens.insert(url, tok);
+            save_tokens(&tokens);
+            println!("Auth success");
+        }
+        Err(e) => {
+            eprintln!("Auth failed: {e}");
+            std::process::exit(1);
+        }
+    }
+}
+
+fn cmd_push(opts: PushOpts) {
+    let url = resolve_url(opts.url.clone());
+    let mut tokens = load_tokens();
+    let api = Api::new(&url);
+    if let Some(tok) = tokens.get(&url) {
+        mita::api::set_token(tok.clone());
+    }
+
+    let view_name = opts.view.unwrap_or_else(|| {
+        hostname::get()
+            .map(|h| h.to_string_lossy().into_owned())
+            .unwrap_or_else(|_| "default".into())
+    });
+
+    let comp = match opts.component_type.as_str() {
+        "variable" => {
+            let v = Variable::new(opts.component_name, opts.component_value);
+            Component::from(v)
+        }
+        "progress_bar" => {
+            let total = opts.total.unwrap_or(100.0);
+            let val: f64 = opts.component_value.parse().unwrap_or(0.0);
+            let pb = ProgressBar::new(opts.component_name, val, total);
+            Component::from(pb)
+        }
+        "logger" => {
+            let mut lg = Logger::new(opts.component_name);
+            lg.log(opts.component_value);
+            Component::from(lg)
+        }
+        "line_chart" => {
+            let mut lc = LineChart::new(opts.component_name, "x", "y");
+            // value expected as "x,y,label"
+            let parts: Vec<&str> = opts.component_value.split(',').collect();
+            if parts.len() == 3 {
+                if let (Ok(x), Ok(y)) = (parts[0].parse::<f64>(), parts[1].parse::<f64>()) {
+                    lc.add(x, y, parts[2]);
+                }
+            }
+            Component::from(lc)
+        }
+        other => {
+            eprintln!("Unsupported component type: {other}");
+            std::process::exit(1);
+        }
+    };
+
+    let mut view = View::new(Some(view_name));
+    view.add([comp]);
+
+    match api.push(&view) {
+        Ok(()) => {
+            println!("Push success");
+            return;
+        }
+        Err(MitaError::Auth) => {
+            if let Some(pwd) = opts.password.or_else(|| std::env::var("MITA_PASSWORD").ok()) {
+                match api.auth_token(&pwd) {
+                    Ok(tok) => {
+                        tokens.insert(url.clone(), tok.clone());
+                        save_tokens(&tokens);
+                        if api.push(&view).is_ok() {
+                            println!("Push success");
+                            return;
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("Auth failed: {e}");
+                        std::process::exit(1);
+                    }
+                }
+            }
+            eprintln!("Authentication required");
+            std::process::exit(1);
+        }
+        Err(e) => {
+            eprintln!("Push failed: {e}");
+            std::process::exit(1);
+        }
+    }
+}

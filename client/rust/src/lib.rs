@@ -1,4 +1,4 @@
-mod api;
+pub mod api;
 mod client;
 mod components;
 mod error;
@@ -21,3 +21,6 @@ pub const MITA_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[cfg(feature = "progress")]
 pub use mita_tqdm::MitaTqdm;
+
+pub use api::{Api, State};
+pub use error::MitaError;
