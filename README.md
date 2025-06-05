@@ -106,6 +106,50 @@ with Mita(ADDRESS, PASSWORD) as client:
         client.push()
 ```
 
+#### Rust Client Library
+
+Add the crate to your `Cargo.toml`:
+
+```toml
+# enable "progress" and "log" features if needed
+mita = { version = "0.0.0", features = ["progress", "log"] } # check crates.io for the latest version
+```
+
+Use the library in your Rust application:
+
+```rust
+use mita::{Mita, View, Variable, ProgressBar, Logger, LineChart, Component};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut logger = Logger::new("rust_logger");
+    let mut line_chart = LineChart::new("rust_line_chart", "x", "y");
+    let mut progress_bar = ProgressBar::new("rust_progress_bar", 0.0, 100.0);
+    let var = Variable::new("rust_var", 100);
+
+    let mut client = Mita::init(ADDRESS, PASSWORD, false)?;
+
+    for i in 0..10 {
+        logger.log(format!("some msg {i}"));
+        line_chart.add(1.0 + i as f64, 1.0 + i as f64, "pos");
+        line_chart.add(1.0 + i as f64, 3.5 - i as f64, "neg");
+        progress_bar.set(i as f64 * 8.0 + 1.0);
+
+        let mut view = View::new(Some("rust_view"));
+        view.add([
+            Component::from(var.clone()),
+            Component::from(progress_bar.clone()),
+            Component::from(logger.clone()),
+            Component::from(line_chart.clone()),
+        ]);
+
+        client.add(&view)?;
+    }
+
+    client.join();
+    Ok(())
+}
+```
+
 #### Rust CLI
 
 Build the Rust CLI from source:
