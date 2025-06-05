@@ -4,5 +4,5 @@ pub(crate) mod logger;
 pub(crate) mod progress_bar;
 pub(crate) mod variable;
 
-// 若需要“枚举封装”
+// Use this when an enum wrapper is needed
 pub(crate) use common::Component;

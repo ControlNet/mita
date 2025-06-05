@@ -21,9 +21,9 @@ impl MitaClient {
     pub fn new(
         url: Option<impl Into<String>>,
         password: Option<impl Into<String>>,
-        threads: Option<usize>,   // 默认为 1
-        queue_cap: Option<usize>, // 默认为 256
-        verbose: bool,            // 和 Python 一致：默认 false
+        threads: Option<usize>,   // default is 1
+        queue_cap: Option<usize>, // default is 256
+        verbose: bool,            // same as Python: default false
     ) -> Result<Self, MitaError> {
         // ---------- 1. Parse URL / PASSWORD ----------
         let url = url

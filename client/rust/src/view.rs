@@ -1,5 +1,5 @@
 use crate::components::Component;
-use serde::Serialize; // 假设已在 Cargo.toml 启用 serde + derive
+use serde::Serialize; // assumes serde + derive is enabled in Cargo.toml
 use std::iter::IntoIterator;
 
 #[derive(Serialize)]
@@ -19,7 +19,7 @@ impl View {
         }
     }
 
-    /// 把若干组件批量压入并返回可链式调用的 &mut Self
+    /// Push several components at once and return a chainable &mut Self
     pub fn add<I>(&mut self, components: I) -> &mut Self
     where
         I: IntoIterator<Item = Component>,
@@ -28,11 +28,11 @@ impl View {
         self
     }
 
-    /// 序列化成等价的 Python dict 结构
+    /// Serialize to the equivalent Python dict structure
     pub fn to_json(&self) -> serde_json::Value {
         serde_json::json!({
             "view": self.view,
-            "data": self.data,   // 组件本身已实现 Serialize
+            "data": self.data,   // each component already implements Serialize
         })
     }
 
