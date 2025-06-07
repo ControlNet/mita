@@ -173,6 +173,29 @@ mita push progress_bar progress 20 --total 100
 mita push --view my_view variable some_var "Hello World"
 ```
 
+#### Simple CLI demo
+
+```zsh
+#!/bin/bash
+
+MITA_CLI="./target/release/mita"  # the default cargo build directory, or anywhere you put the executable
+VIEW_NAME="cli-test"
+COMP_NAME="progress-loop"
+TOTAL=100
+URL= # your mita server address
+PASSWORD= # your password
+
+# auth on first run
+$MITA_CLI auth --url $URL --password $PASSWORD
+
+# loop
+for ((i=0; i<=$TOTAL; i+=5)); do
+    echo "Push $i/$TOTAL"
+    $MITA_CLI push --view $VIEW_NAME progress_bar "$COMP_NAME" "$i" --total $TOTAL
+    sleep 1
+done
+```
+
 ## License
 
 | Module | License                        |
