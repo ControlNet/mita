@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand, Args};
+use clap::{Parser, Subcommand, Args, ValueEnum};
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
@@ -27,6 +27,15 @@ struct AuthOpts {
     password: Option<String>,
 }
 
+#[derive(Clone, Debug, ValueEnum)]
+#[clap(rename_all = "snake_case")]
+enum ComponentType {
+    Variable,
+    ProgressBar,
+    Logger,
+    LineChart,
+}
+
 #[derive(Args)]
 struct PushOpts {
     #[arg(long)]
@@ -35,7 +44,8 @@ struct PushOpts {
     url: Option<String>,
     #[arg(long)]
     password: Option<String>,
-    component_type: String,
+    #[arg(value_enum)]
+    component_type: ComponentType,
     component_name: String,
     component_value: String,
     #[arg(long)]
@@ -123,23 +133,23 @@ fn cmd_push(opts: PushOpts) {
             .unwrap_or_else(|_| "default".into())
     });
 
-    let comp = match opts.component_type.as_str() {
-        "variable" => {
+    let comp = match opts.component_type {
+        ComponentType::Variable => {
             let v = Variable::new(opts.component_name, opts.component_value);
             Component::from(v)
         }
-        "progress_bar" => {
+        ComponentType::ProgressBar => {
             let total = opts.total.unwrap_or(100.0);
             let val: f64 = opts.component_value.parse().unwrap_or(0.0);
             let pb = ProgressBar::new(opts.component_name, val, total);
             Component::from(pb)
         }
-        "logger" => {
+        ComponentType::Logger => {
             let mut lg = Logger::new(opts.component_name);
             lg.log(opts.component_value);
             Component::from(lg)
         }
-        "line_chart" => {
+        ComponentType::LineChart => {
             let mut lc = LineChart::new(opts.component_name, "x", "y");
             // value expected as "x,y,label"
             let parts: Vec<&str> = opts.component_value.split(',').collect();
@@ -149,10 +159,6 @@ fn cmd_push(opts: PushOpts) {
                 }
             }
             Component::from(lc)
-        }
-        other => {
-            eprintln!("Unsupported component type: {other}");
-            std::process::exit(1);
         }
     };
 
