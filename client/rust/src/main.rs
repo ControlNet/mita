@@ -2,6 +2,7 @@ use clap::{Parser, Subcommand, Args, ValueEnum};
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
+use serde::{Deserialize, Serialize};
 use mita::{Api, View, Variable, ProgressBar, Logger, LineChart, Component, MitaError};
 
 #[derive(Parser)]
@@ -52,6 +53,12 @@ struct PushOpts {
     total: Option<f64>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Default)]
+struct TokenStore {
+    pub last_url: Option<String>,
+    pub tokens: HashMap<String, String>,
+}
+
 fn token_file() -> PathBuf {
     let base = match dirs::home_dir() {
         Some(dir) => dir,
@@ -63,19 +70,26 @@ fn token_file() -> PathBuf {
     base.join(".mita.json")
 }
 
-fn load_tokens() -> HashMap<String, String> {
+fn load_token_store() -> TokenStore {
     let path = token_file();
     if let Ok(s) = fs::read_to_string(path) {
         serde_json::from_str(&s).unwrap_or_default()
     } else {
-        HashMap::new()
+        TokenStore::default()
     }
 }
 
-fn save_tokens(map: &HashMap<String, String>) {
+fn save_token_store(store: &TokenStore) {
     let path = token_file();
-    if let Ok(s) = serde_json::to_string(map) {
-        let _ = fs::write(path, s);
+    match serde_json::to_string_pretty(store) {
+        Ok(json) => {
+            if let Err(e) = fs::write(&path, json) {
+                eprintln!("Failed to write token file: {e}");
+            }
+        }
+        Err(e) => {
+            eprintln!("Failed to serialize token store: {e}");
+        }
     }
 }
 
@@ -89,10 +103,7 @@ fn main() {
 
 fn resolve_url(arg: Option<String>) -> String {
     arg.or_else(|| std::env::var("MITA_ADDRESS").ok())
-        .or_else(|| {
-            let tokens = load_tokens();
-            tokens.get("url").cloned()
-        })
+        .or_else(|| { load_token_store().last_url })
         .expect("MITA_ADDRESS not set (no CLI arg, no env, no auth token)")
 }
 
@@ -101,15 +112,20 @@ fn resolve_pwd(arg: Option<String>) -> String {
         .expect("MITA_PASSWORD not set")
 }
 
+fn resolve_token(url: &str) -> Option<String> {
+    load_token_store().tokens.get(url).cloned()
+}
+
 fn cmd_auth(opts: AuthOpts) {
     let url = resolve_url(opts.url);
     let password = resolve_pwd(opts.password);
     let api = Api::new(&url);
     match api.auth_token(&password) {
         Ok(tok) => {
-            let mut tokens = load_tokens();
-            tokens.insert("url".into(), url.clone());
-            save_tokens(&tokens);
+            let mut store = load_token_store();
+            store.last_url = Some(url.clone());
+            store.tokens.insert(url.clone(), tok.clone());
+            save_token_store(&store);
             println!("Auth success");
         }
         Err(e) => {
@@ -121,9 +137,8 @@ fn cmd_auth(opts: AuthOpts) {
 
 fn cmd_push(opts: PushOpts) {
     let url = resolve_url(opts.url.clone());
-    let mut tokens = load_tokens();
     let api = Api::new(&url);
-    if let Some(tok) = tokens.get(&url) {
+    if let Some(tok) = resolve_token(&url) {
         mita::api::set_token(tok.clone());
     }
 
@@ -174,8 +189,10 @@ fn cmd_push(opts: PushOpts) {
             if let Some(pwd) = opts.password.or_else(|| std::env::var("MITA_PASSWORD").ok()) {
                 match api.auth_token(&pwd) {
                     Ok(tok) => {
-                        tokens.insert(url.clone(), tok.clone());
-                        save_tokens(&tokens);
+                        let mut token_store = load_token_store();
+                        token_store.last_url = Some(url.clone());
+                        token_store.tokens.insert(url.clone(), tok.clone());
+                        save_token_store(&token_store);
                         if api.push(&view).is_ok() {
                             println!("Push success");
                             return;
