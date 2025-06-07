@@ -79,7 +79,11 @@ fn main() {
 
 fn resolve_url(arg: Option<String>) -> String {
     arg.or_else(|| std::env::var("MITA_ADDRESS").ok())
-        .expect("MITA_ADDRESS not set")
+        .or_else(|| {
+            let tokens = load_tokens();
+            tokens.get("url").cloned()
+        })
+        .expect("MITA_ADDRESS not set (no CLI arg, no env, no auth token)")
 }
 
 fn resolve_pwd(arg: Option<String>) -> String {
@@ -94,7 +98,7 @@ fn cmd_auth(opts: AuthOpts) {
     match api.auth_token(&password) {
         Ok(tok) => {
             let mut tokens = load_tokens();
-            tokens.insert(url, tok);
+            tokens.insert("url".into(), url.clone());
             save_tokens(&tokens);
             println!("Auth success");
         }
