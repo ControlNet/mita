@@ -67,7 +67,7 @@ fn token_file() -> PathBuf {
     let base = match dirs::home_dir() {
         Some(dir) => dir,
         None => {
-            eprintln!("Home directory not found, using current directory for token file");
+            eprintln!("[Mita] Home directory not found, using current directory for token file");
             PathBuf::from(".")
         }
     };
@@ -88,11 +88,11 @@ fn save_token_store(store: &TokenStore) {
     match serde_json::to_string_pretty(store) {
         Ok(json) => {
             if let Err(e) = fs::write(&path, json) {
-                eprintln!("Failed to write token file: {e}");
+                eprintln!("[Mita] Failed to write token file: {e}");
             }
         }
         Err(e) => {
-            eprintln!("Failed to serialize token store: {e}");
+            eprintln!("[Mita] Failed to serialize token store: {e}");
         }
     }
 }
@@ -122,25 +122,25 @@ fn resolve_token(url: &str) -> Option<String> {
 
 fn print_token_info(url: String, tok: &str) {
     let Some(claims) = parse_jwt_claims(tok) else {
-        println!("Error: cannot read JWT claims");
+        eprintln!("[Mita/Auth] Error: cannot read JWT claims");
         return;
     };
 
-    println!("Already authenticated to: {url}, using auth token of last connection ...");
+    println!("🔐 Already authenticated to: {url}, using auth token of last connection ...");
 
     if let Some(exp_time) = claims.get_expire_datetime() {
-        println!("Token valid through: {}", exp_time.format("%Y-%m-%d %H:%M:%S"));
+        println!("📅 Token valid through: {}", exp_time.format("%Y-%m-%d %H:%M:%S"));
         if exp_time < Utc::now() {
-            println!("Token is expired now.");
-            println!("Please execute: mita auth --force");
+            println!("❌ Token is expired now.");
+            println!("💡 Please execute: mita auth --force");
             return;
         }
     } else {
-        println!("No expire date found");
+        println!("⚠️ No expire date found.");
     }
 
     if let Some(iss) = &claims.iss {
-        println!("Issuer: {iss}");
+        println!("🔖 Issuer: {iss}.");
     }
 
     return;
@@ -160,7 +160,7 @@ fn cmd_auth(opts: AuthOpts) {
         }
     }
 
-    println!("Authenticating to server: {url}");
+    println!("🔄 Authenticating to server: {url}");
 
     let password = resolve_pwd(opts.password);
     let api = Api::new(&url);
@@ -169,10 +169,10 @@ fn cmd_auth(opts: AuthOpts) {
             store.last_url = Some(url.clone());
             store.tokens.insert(url.clone(), tok.clone());
             save_token_store(&store);
-            println!("Auth success to server: {url}");
+            println!("✅ Auth success to server: {url}");
         }
         Err(e) => {
-            eprintln!("Auth failed: {e}");
+            eprintln!("[Mita/Auth] Auth failed: {e}");
             std::process::exit(1);
         }
     }
@@ -225,7 +225,7 @@ fn cmd_push(opts: PushOpts) {
 
     match api.push(&view) {
         Ok(()) => {
-            println!("Push success");
+            println!("📤 Push success.");
             return;
         }
         Err(MitaError::Auth) => {
@@ -237,21 +237,21 @@ fn cmd_push(opts: PushOpts) {
                         token_store.tokens.insert(url.clone(), tok.clone());
                         save_token_store(&token_store);
                         if api.push(&view).is_ok() {
-                            println!("Push success");
+                            println!("📤 Push success.");
                             return;
                         }
                     }
                     Err(e) => {
-                        eprintln!("Auth failed: {e}");
+                        eprintln!("[Mita/Auth] Auth failed: {e}");
                         std::process::exit(1);
                     }
                 }
             }
-            eprintln!("Authentication required");
+            eprintln!("[Mita/Auth] Authentication required");
             std::process::exit(1);
         }
         Err(e) => {
-            eprintln!("Push failed: {e}");
+            eprintln!("[Mita/Error] Push failed: {e}");
             std::process::exit(1);
         }
     }
