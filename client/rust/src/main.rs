@@ -26,6 +26,8 @@ struct AuthOpts {
     url: Option<String>,
     #[arg(long)]
     password: Option<String>,
+    #[arg(long, help = "Force re-authentication even if token exists")]
+    force: bool,
 }
 
 #[derive(Clone, Debug, ValueEnum)]
@@ -118,15 +120,26 @@ fn resolve_token(url: &str) -> Option<String> {
 
 fn cmd_auth(opts: AuthOpts) {
     let url = resolve_url(opts.url);
+
+    let mut store = load_token_store();
+
+    if !opts.force {
+        if let Some(tok) = store.tokens.get(&url) {
+            println!("Already authenticated: {url}");
+            return;
+        }
+    }
+
+    println!("Authenticating into: {url}");
+
     let password = resolve_pwd(opts.password);
     let api = Api::new(&url);
     match api.auth_token(&password) {
         Ok(tok) => {
-            let mut store = load_token_store();
             store.last_url = Some(url.clone());
             store.tokens.insert(url.clone(), tok.clone());
             save_token_store(&store);
-            println!("Auth success");
+            println!("Auth success into: {url}");
         }
         Err(e) => {
             eprintln!("Auth failed: {e}");
