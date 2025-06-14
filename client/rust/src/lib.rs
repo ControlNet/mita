@@ -1,4 +1,5 @@
 pub mod api;
+pub mod jwt;
 mod client;
 mod components;
 mod error;

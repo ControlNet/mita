@@ -1,9 +1,11 @@
-use clap::{Parser, Subcommand, Args, ValueEnum};
+use chrono::Utc;
+use clap::{Args, Parser, Subcommand, ValueEnum};
+use mita::jwt::parse_jwt_claims;
+use mita::{Api, Component, LineChart, Logger, MitaError, ProgressBar, Variable, View};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
-use serde::{Deserialize, Serialize};
-use mita::{Api, View, Variable, ProgressBar, Logger, LineChart, Component, MitaError};
 
 #[derive(Parser)]
 #[command(name = "mita", about = "CLI for Mita Rust client")]
@@ -118,6 +120,32 @@ fn resolve_token(url: &str) -> Option<String> {
     load_token_store().tokens.get(url).cloned()
 }
 
+fn print_token_info(url: String, tok: &str) {
+    let Some(claims) = parse_jwt_claims(tok) else {
+        println!("Error: cannot read JWT claims");
+        return;
+    };
+
+    println!("Already authenticated to: {url}, using auth token of last connection ...");
+
+    if let Some(exp_time) = claims.get_expire_datetime() {
+        println!("Token valid through: {}", exp_time.format("%Y-%m-%d %H:%M:%S"));
+        if exp_time < Utc::now() {
+            println!("Token is expired now.");
+            println!("Please execute: mita auth --force");
+            return;
+        }
+    } else {
+        println!("No expire date found");
+    }
+
+    if let Some(iss) = &claims.iss {
+        println!("Issuer: {iss}");
+    }
+
+    return;
+}
+
 fn cmd_auth(opts: AuthOpts) {
     let url = resolve_url(opts.url);
 
@@ -125,12 +153,14 @@ fn cmd_auth(opts: AuthOpts) {
 
     if !opts.force {
         if let Some(tok) = store.tokens.get(&url) {
-            println!("Already authenticated: {url}");
+            print_token_info(url, tok);
+
+            // Silently exit the program
             return;
         }
     }
 
-    println!("Authenticating into: {url}");
+    println!("Authenticating to server: {url}");
 
     let password = resolve_pwd(opts.password);
     let api = Api::new(&url);
@@ -139,7 +169,7 @@ fn cmd_auth(opts: AuthOpts) {
             store.last_url = Some(url.clone());
             store.tokens.insert(url.clone(), tok.clone());
             save_token_store(&store);
-            println!("Auth success into: {url}");
+            println!("Auth success to server: {url}");
         }
         Err(e) => {
             eprintln!("Auth failed: {e}");
