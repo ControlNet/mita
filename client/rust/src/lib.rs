@@ -1,8 +1,8 @@
 pub mod api;
-pub mod jwt;
 mod client;
 mod components;
 mod error;
+pub mod jwt;
 #[cfg(feature = "progress")]
 mod mita_tqdm;
 mod view;

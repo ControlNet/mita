@@ -107,7 +107,7 @@ fn main() {
 
 fn resolve_url(arg: Option<String>) -> String {
     arg.or_else(|| std::env::var("MITA_ADDRESS").ok())
-        .or_else(|| { load_token_store().last_url })
+        .or_else(|| load_token_store().last_url)
         .expect("MITA_ADDRESS not set (no CLI arg, no env, no auth token)")
 }
 
@@ -129,7 +129,10 @@ fn print_token_info(url: String, tok: &str) {
     println!("🔐 Already authenticated to: {url}, using auth token of last connection ...");
 
     if let Some(exp_time) = claims.get_expire_datetime() {
-        println!("📅 Token valid through: {}", exp_time.format("%Y-%m-%d %H:%M:%S"));
+        println!(
+            "📅 Token valid through: {}",
+            exp_time.format("%Y-%m-%d %H:%M:%S")
+        );
         if exp_time < Utc::now() {
             println!("❌ Token is expired now.");
             println!("💡 Please execute: mita auth --force");
@@ -229,7 +232,10 @@ fn cmd_push(opts: PushOpts) {
             return;
         }
         Err(MitaError::Auth) => {
-            if let Some(pwd) = opts.password.or_else(|| std::env::var("MITA_PASSWORD").ok()) {
+            if let Some(pwd) = opts
+                .password
+                .or_else(|| std::env::var("MITA_PASSWORD").ok())
+            {
                 match api.auth_token(&pwd) {
                     Ok(tok) => {
                         let mut token_store = load_token_store();

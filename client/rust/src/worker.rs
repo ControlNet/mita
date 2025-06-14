@@ -96,10 +96,7 @@ impl MitaWorker {
                 match api.push(&payload) {
                     Ok(()) => {
                         if verbose {
-                            println!(
-                                "[MitaWorker] pushed in {:.3}s",
-                                t0.elapsed().as_secs_f64()
-                            );
+                            println!("[MitaWorker] pushed in {:.3}s", t0.elapsed().as_secs_f64());
                         }
                     }
                     Err(MitaError::Auth) => {

@@ -23,4 +23,3 @@ pub fn parse_jwt_claims(token: &str) -> Option<JwtClaims> {
     let decoded = URL_SAFE_NO_PAD.decode(payload).ok()?;
     serde_json::from_slice(&decoded).ok()
 }
-

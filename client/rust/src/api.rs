@@ -40,8 +40,7 @@ impl Api {
             .send()?;
 
         if resp.status().is_success() {
-            let tok = resp
-                .json::<serde_json::Value>()?["token"]
+            let tok = resp.json::<serde_json::Value>()?["token"]
                 .as_str()
                 .ok_or(MitaError::Auth)?
                 .to_owned();
