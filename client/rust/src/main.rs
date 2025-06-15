@@ -1,11 +1,9 @@
 use chrono::Utc;
 use clap::{Args, Parser, Subcommand, ValueEnum};
-use mita::jwt::parse_jwt_claims;
+use mita::jwt::{parse_jwt_claims, JwtClaims};
+use mita::spinner_utils::with_spinner;
+use mita::token_store;
 use mita::{Api, Component, LineChart, Logger, MitaError, ProgressBar, Variable, View};
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::fs;
-use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(name = "mita", about = "CLI for Mita Rust client")]
@@ -57,46 +55,6 @@ struct PushOpts {
     total: Option<f64>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
-struct TokenStore {
-    pub last_url: Option<String>,
-    pub tokens: HashMap<String, String>,
-}
-
-fn token_file() -> PathBuf {
-    let base = match dirs::home_dir() {
-        Some(dir) => dir,
-        None => {
-            eprintln!("[Mita] Home directory not found, using current directory for token file");
-            PathBuf::from(".")
-        }
-    };
-    base.join(".mita.json")
-}
-
-fn load_token_store() -> TokenStore {
-    let path = token_file();
-    if let Ok(s) = fs::read_to_string(path) {
-        serde_json::from_str(&s).unwrap_or_default()
-    } else {
-        TokenStore::default()
-    }
-}
-
-fn save_token_store(store: &TokenStore) {
-    let path = token_file();
-    match serde_json::to_string_pretty(store) {
-        Ok(json) => {
-            if let Err(e) = fs::write(&path, json) {
-                eprintln!("[Mita] Failed to write token file: {e}");
-            }
-        }
-        Err(e) => {
-            eprintln!("[Mita] Failed to serialize token store: {e}");
-        }
-    }
-}
-
 fn main() {
     let cli = Cli::parse();
     match cli.command {
@@ -107,7 +65,7 @@ fn main() {
 
 fn resolve_url(arg: Option<String>) -> String {
     arg.or_else(|| std::env::var("MITA_ADDRESS").ok())
-        .or_else(|| load_token_store().last_url)
+        .or_else(|| token_store::load_token_store().last_url)
         .expect("MITA_ADDRESS not set (no CLI arg, no env, no auth token)")
 }
 
@@ -117,15 +75,10 @@ fn resolve_pwd(arg: Option<String>) -> String {
 }
 
 fn resolve_token(url: &str) -> Option<String> {
-    load_token_store().tokens.get(url).cloned()
+    token_store::load_token_store().tokens.get(url).cloned()
 }
 
-fn print_token_info(url: String, tok: &str) {
-    let Some(claims) = parse_jwt_claims(tok) else {
-        eprintln!("[Mita/Auth] Error: cannot read JWT claims");
-        return;
-    };
-
+fn print_token_info(url: &String, claims: &JwtClaims) {
     println!("🔐 Already authenticated to: {url}, using auth token of last connection ...");
 
     if let Some(exp_time) = claims.get_expire_datetime() {
@@ -152,7 +105,7 @@ fn print_token_info(url: String, tok: &str) {
 fn cmd_auth(opts: AuthOpts) {
     let url = resolve_url(opts.url);
 
-    let mut store = load_token_store();
+    let mut store = token_store::load_token_store();
 
     if !opts.force {
         if let Some(tok) = store.tokens.get(&url) {
@@ -174,11 +127,15 @@ fn cmd_auth(opts: AuthOpts) {
 
     let password = resolve_pwd(opts.password);
     let api = Api::new(&url);
-    match api.auth_token(&password) {
+
+    let auth_result = with_spinner(&format!(" Authenticating to {url}..."), || {
+        api.auth_token(&password)
+    });
+
+    match auth_result {
         Ok(tok) => {
-            store.last_url = Some(url.clone());
-            store.tokens.insert(url.clone(), tok.clone());
-            save_token_store(&store);
+            store.insert_new_token(&url, tok);
+            token_store::save_token_store(&store);
             println!("✅ Auth success to server: {url}");
         }
         Err(e) => {
@@ -233,7 +190,9 @@ fn cmd_push(opts: PushOpts) {
     let mut view = View::new(Some(view_name));
     view.add([comp]);
 
-    match api.push(&view) {
+    let push_result = with_spinner(" Sending push payload...", || api.push(&view));
+
+    match push_result {
         Ok(()) => {
             println!("📤 Push success.");
             return;
@@ -245,10 +204,10 @@ fn cmd_push(opts: PushOpts) {
             {
                 match api.auth_token(&pwd) {
                     Ok(tok) => {
-                        let mut token_store = load_token_store();
+                        let mut token_store = token_store::load_token_store();
                         token_store.last_url = Some(url.clone());
                         token_store.tokens.insert(url.clone(), tok.clone());
-                        save_token_store(&token_store);
+                        token_store::save_token_store(&token_store);
                         if api.push(&view).is_ok() {
                             println!("📤 Push success.");
                             return;
