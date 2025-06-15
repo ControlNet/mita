@@ -1,6 +1,6 @@
 [package]
 name = "mita"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["ControlNet <smczx@hotmail.com>"]
 edition = "2021"
 license = "MIT"
