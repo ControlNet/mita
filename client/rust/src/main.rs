@@ -99,7 +99,6 @@ fn print_token_info(url: &String, claims: &JwtClaims) {
         println!("🔖 Issuer: {iss}.");
     }
 
-    return;
 }
 
 fn cmd_auth(opts: AuthOpts) {

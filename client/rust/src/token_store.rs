@@ -30,7 +30,13 @@ fn token_file() -> PathBuf {
 pub fn load_token_store() -> TokenStore {
     let path = token_file();
     if let Ok(s) = fs::read_to_string(path) {
-        serde_json::from_str(&s).unwrap_or_default()
+        match serde_json::from_str(&s) {
+            Ok(store) => store,
+            Err(e) => {
+                eprintln!("[Mita] Failed to deserialize token file: {e}");
+                TokenStore::default()
+            }
+        }
     } else {
         TokenStore::default()
     }
