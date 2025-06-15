@@ -109,7 +109,7 @@ fn cmd_auth(opts: AuthOpts) {
     if !opts.force {
         if let Some(tok) = store.tokens.get(&url) {
             let Some(claims) = parse_jwt_claims(tok) else {
-                eprintln!("[Mita/Auth] Error: cannot read JWT claims");
+                eprintln!("🚨 [Mita/Auth] Error: cannot read JWT claims");
                 return;
             };
 
@@ -127,7 +127,7 @@ fn cmd_auth(opts: AuthOpts) {
     let password = resolve_pwd(opts.password);
     let api = Api::new(&url);
 
-    let auth_result = with_spinner(&format!(" Authenticating to {url}..."), || {
+    let auth_result = with_spinner(&format!("🔐 Authenticating to {url}..."), || {
         api.auth_token(&password)
     });
 
@@ -138,7 +138,7 @@ fn cmd_auth(opts: AuthOpts) {
             println!("✅ Auth success to server: {url}");
         }
         Err(e) => {
-            eprintln!("[Mita/Auth] Auth failed: {e}");
+            eprintln!("❌ [Mita/Auth] Auth failed: {e}");
             std::process::exit(1);
         }
     }
@@ -189,7 +189,7 @@ fn cmd_push(opts: PushOpts) {
     let mut view = View::new(Some(view_name));
     view.add([comp]);
 
-    let push_result = with_spinner(" Sending push payload...", || api.push(&view));
+    let push_result = with_spinner("📤 Sending push payload...", || api.push(&view));
 
     match push_result {
         Ok(()) => {
@@ -212,12 +212,12 @@ fn cmd_push(opts: PushOpts) {
                         }
                     }
                     Err(e) => {
-                        eprintln!("[Mita/Auth] Auth failed: {e}");
+                        eprintln!("❌ [Mita/Auth] Auth failed: {e}");
                         std::process::exit(1);
                     }
                 }
             }
-            eprintln!("[Mita/Auth] Authentication required");
+            eprintln!("🔑 [Mita/Auth] Authentication required");
             std::process::exit(1);
         }
         Err(e) => {

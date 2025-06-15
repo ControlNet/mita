@@ -14,6 +14,9 @@
     <a href="https://pypi.org/project/mita_client/">
         <img src="https://img.shields.io/pypi/v/mita_client?style=flat-square&logo=python&label=Python">
     </a>
+    <a href="https://crates.io/crates/mita">
+        <img src="https://img.shields.io/crates/v/mita?style=flat-square&logo=rust&label=Rust">
+    </a>
 </div>
 
 Mita, named as Multi-Tangled, is a web application for monitoring runtime status and data of multiple machines 
@@ -106,6 +109,31 @@ with Mita(ADDRESS, PASSWORD) as client:
         client.push()
 ```
 
+#### CLI App (Rust-based)
+
+Build the Rust CLI from source:
+
+```bash
+cargo install mita
+```
+
+Authenticate with a Mita server (falls back to `MITA_ADDRESS` and `MITA_PASSWORD` when flags are omitted):
+
+```bash
+mita auth --url http://your.mita.server:9000 --password <PASSWORD>
+```
+
+Tokens are stored in `~/.mita.json` per server URL.
+
+Push updates (falls back to `MITA_ADDRESS` and `MITA_PASSWORD` when flags are omitted):
+
+```bash
+mita push [--view <VIEW_NAME>] <COMPONENT_TYPE> <COMPONENT_NAME> <COMPONENT_VALUE> [--args]
+# examples
+mita push progress_bar progress 20 --total 100
+mita push --view my_view variable some_var "Hello World"
+```
+
 #### Rust Client Library
 
 Add the crate to your `Cargo.toml`:
@@ -150,28 +178,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-#### Rust CLI
-
-Build the Rust CLI from source:
-
-```bash
-cargo build --manifest-path client/rust/Cargo.toml --release
-```
-
-Authenticate with a Mita server:
-
-```bash
-mita auth --url http://your.mita.server:9000 --password <PASSWORD>
-```
-
-Tokens are stored in `~/.mita.json` per server URL.
-
-Push updates (falls back to `MITA_ADDRESS` and `MITA_PASSWORD` when flags are omitted):
-
-```bash
-mita push progress_bar progress 20 --total 100
-mita push --view my_view variable some_var "Hello World"
-```
 
 #### Simple CLI demo
 

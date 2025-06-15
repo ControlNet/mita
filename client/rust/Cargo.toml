@@ -4,9 +4,16 @@ version = "0.0.0"
 authors = ["ControlNet <smczx@hotmail.com>"]
 edition = "2021"
 license = "MIT"
-description = "Mita client"
+description = "Mita client - CLI and library for Mita monitoring system"
 homepage = "https://github.com/ControlNet/mita"
 repository = "https://github.com/ControlNet/mita"
+keywords = ["monitoring", "dashboard", "cli", "logging", "progress"]
+categories = ["command-line-utilities", "development-tools", "visualization"]
+readme = "../../README.md"
+
+[[bin]]
+name = "mita"
+path = "src/main.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
