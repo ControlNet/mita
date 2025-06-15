@@ -2,8 +2,11 @@ pub mod api;
 mod client;
 mod components;
 mod error;
+pub mod jwt;
 #[cfg(feature = "progress")]
 mod mita_tqdm;
+pub mod spinner_utils;
+pub mod token_store;
 mod view;
 mod worker;
 
@@ -18,6 +21,8 @@ pub use view::View;
 
 /// similar to __version__ inside setup.py —— written to code
 pub const MITA_VERSION: &str = env!("CARGO_PKG_VERSION");
+
+pub const MAX_WAITING_SEC: u64 = 30;
 
 #[cfg(feature = "progress")]
 pub use mita_tqdm::MitaTqdm;

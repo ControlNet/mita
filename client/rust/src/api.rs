@@ -1,5 +1,5 @@
 use crate::error::MitaError;
-use crate::MITA_VERSION;
+use crate::{MAX_WAITING_SEC, MITA_VERSION};
 use reqwest::blocking::Client;
 use serde_json::json;
 use std::cell::RefCell;
@@ -25,7 +25,7 @@ impl Api {
         Self {
             url_base: url_base.into(),
             http: Client::builder()
-                .timeout(std::time::Duration::from_secs(30))
+                .timeout(std::time::Duration::from_secs(MAX_WAITING_SEC))
                 .user_agent(format!("mita_client_rust/{}", MITA_VERSION))
                 .build()
                 .unwrap(),
@@ -40,8 +40,7 @@ impl Api {
             .send()?;
 
         if resp.status().is_success() {
-            let tok = resp
-                .json::<serde_json::Value>()?["token"]
+            let tok = resp.json::<serde_json::Value>()?["token"]
                 .as_str()
                 .ok_or(MitaError::Auth)?
                 .to_owned();
