@@ -6,9 +6,6 @@ use serde::Deserialize;
 pub struct JwtClaims {
     pub iss: Option<String>,
     pub exp: Option<i64>,
-    iat: Option<i64>,
-    sub: Option<String>,
-    jti: Option<String>,
 }
 
 impl JwtClaims {

@@ -1,5 +1,5 @@
 //! worker.rs —— The background thread pool which is responsible to push JSON views to Mita Server
-use crossbeam_channel::{bounded, Receiver, Sender};
+use crossbeam_channel::{bounded, Receiver, RecvTimeoutError, Sender};
 use std::{
     sync::{
         atomic::{AtomicBool, Ordering},
@@ -8,7 +8,7 @@ use std::{
     thread::{self, JoinHandle},
     time::Instant,
 };
-
+use std::time::Duration;
 use crate::{api::Api, error::MitaError};
 
 pub type Payload = serde_json::Value;
@@ -90,33 +90,50 @@ impl MitaWorker {
             }
 
             // Main loop
-            while let Ok(payload) = rx.recv() {
-                println!("[MitaWorker] received payload = {}", payload);
-                let t0 = Instant::now();
-                match api.push(&payload) {
-                    Ok(()) => {
-                        if verbose {
-                            println!("[MitaWorker] pushed in {:.3}s", t0.elapsed().as_secs_f64());
-                        }
+            while !stop.load(Ordering::SeqCst) {
+                match rx.recv_timeout(Duration::from_secs(1)) {
+                    Ok(payload) => {
+                        MitaWorker::handle_payload(&api, &password, payload, verbose);
                     }
-                    Err(MitaError::Auth) => {
-                        if api.auth(&password).is_ok() {
-                            let _ = api.push(&payload);
-                        } else {
-                            eprintln!("[MitaWorker] auth retry failed");
-                        }
+                    Err(RecvTimeoutError::Timeout) => {
+                        // Retry, unless stop is triggered (SeqCst is set)
+                        continue;
                     }
-                    Err(MitaError::Net(e)) => {
-                        eprintln!("[MitaWorker] connection error: {e}");
-                    }
-                    Err(MitaError::Config(reason)) => {
-                        eprintln!("[MitaWorker] config error: {reason}");
-                    }
-                    Err(MitaError::QueueClosed) => {
-                        eprintln!("[MitaWorker] queue closed");
+                    Err(RecvTimeoutError::Disconnected) => {
+                        // Channel is closed, exit the thread
+                        break;
                     }
                 }
             }
         })
+    }
+
+    /// Handle payload logics
+    fn handle_payload(api: &Api, password: &str, payload: Payload, verbose: bool) {
+        println!("[MitaWorker] received payload = {}", payload);
+        let t0 = Instant::now();
+        match api.push(&payload) {
+            Ok(()) => {
+                if verbose {
+                    println!("[MitaWorker] pushed in {:.3}s", t0.elapsed().as_secs_f64());
+                }
+            }
+            Err(MitaError::Auth) => {
+                if api.auth(password).is_ok() {
+                    let _ = api.push(&payload);
+                } else {
+                    eprintln!("[MitaWorker] auth retry failed");
+                }
+            }
+            Err(MitaError::Net(e)) => {
+                eprintln!("[MitaWorker] connection error: {e}");
+            }
+            Err(MitaError::Config(reason)) => {
+                eprintln!("[MitaWorker] config error: {reason}");
+            }
+            Err(MitaError::QueueClosed) => {
+                eprintln!("[MitaWorker] queue closed");
+            }
+        }
     }
 }

@@ -1,9 +1,9 @@
-use std::time::Duration;
-
 pub fn with_spinner<T, F: FnOnce() -> T>(msg: &str, f: F) -> T {
     #[cfg(feature = "progress")]
     {
+        use std::time::Duration;
         use indicatif;
+
         let spinner = indicatif::ProgressBar::new_spinner();
         spinner.set_style(
             indicatif::ProgressStyle::with_template("{spinner} {msg}")

@@ -194,7 +194,6 @@ fn cmd_push(opts: PushOpts) {
     match push_result {
         Ok(()) => {
             println!("📤 Push success.");
-            return;
         }
         Err(MitaError::Auth) => {
             if let Some(pwd) = opts
