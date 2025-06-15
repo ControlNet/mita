@@ -5,7 +5,12 @@ on:
 jobs:
   build-test:
     name: Build Test
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-latest, macos-latest]
+        rust: [stable]
 
     steps:
       - name: Checkout
@@ -14,8 +19,26 @@ jobs:
       - name: Setup Rust Toolchain
         uses: actions-rs/toolchain@v1
         with:
-            toolchain: stable
+            toolchain: ${{ matrix.rust }}
             override: true
+
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo build
+        uses: actions/cache@v3
+        with:
+          path: client/rust/target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Build
         working-directory: ./client/rust
@@ -23,9 +46,14 @@ jobs:
           cargo build --verbose
 
   unittest:
-    name: Build Test
-    runs-on: ubuntu-22.04
+    name: Unit Test
+    runs-on: ${{ matrix.os }}
     needs: ["build-test"]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-latest, macos-latest]
+        rust: [stable]
 
     steps:
       - name: Checkout
@@ -34,10 +62,28 @@ jobs:
       - name: Setup Rust Toolchain
         uses: actions-rs/toolchain@v1
         with:
-            toolchain: stable
+            toolchain: ${{ matrix.rust }}
             override: true
 
-      - name: Build
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v3
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo build
+        uses: actions/cache@v3
+        with:
+          path: client/rust/target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Test
         working-directory: ./client/rust
         run: |
           cargo test --verbose
