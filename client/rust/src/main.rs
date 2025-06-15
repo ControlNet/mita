@@ -156,14 +156,21 @@ fn cmd_auth(opts: AuthOpts) {
 
     if !opts.force {
         if let Some(tok) = store.tokens.get(&url) {
-            print_token_info(url, tok);
+            let Some(claims) = parse_jwt_claims(tok) else {
+                eprintln!("[Mita/Auth] Error: cannot read JWT claims");
+                return;
+            };
 
-            // Silently exit the program
-            return;
+            print_token_info(&url, &claims);
+
+            if !claims.is_token_expired() {
+                // Silently exit the program
+                return;
+            }
+
+            println!("⚠️ Token expired, trying to refresh it...");
         }
     }
-
-    println!("🔄 Authenticating to server: {url}");
 
     let password = resolve_pwd(opts.password);
     let api = Api::new(&url);

@@ -16,6 +16,12 @@ impl JwtClaims {
         self.exp
             .and_then(|ts| DateTime::<Utc>::from_timestamp(ts, 0))
     }
+
+    pub fn is_token_expired(&self) -> bool {
+        self.get_expire_datetime()
+            .map(|dt| dt < Utc::now())
+            .unwrap_or(true)
+    }
 }
 
 pub fn parse_jwt_claims(token: &str) -> Option<JwtClaims> {
