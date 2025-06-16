@@ -35,18 +35,30 @@ jobs:
     if: needs.check-version.outputs.local-version != needs.check-version.outputs.remote-version
     uses: ./.github/workflows/client-rust-test.yml
 
-  github-release:
-    name: GitHub Release
+  build:
+    name: Build ${{ matrix.target }}
     needs: [ test ]
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        target:
-          - x86_64-unknown-linux-gnu
-          - x86_64-pc-windows-gnu
-          - x86_64-apple-darwin
-          - aarch64-unknown-linux-gnu
-          - aarch64-apple-darwin
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-22.04
+            use_cross: false
+          - target: x86_64-pc-windows-gnu
+            os: ubuntu-22.04
+            use_cross: true
+          - target: x86_64-apple-darwin
+            os: macos-latest
+            use_cross: false
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-22.04
+            use_cross: true
+          - target: aarch64-apple-darwin
+            os: macos-latest
+            use_cross: false
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -58,11 +70,49 @@ jobs:
             override: true
             target: ${{ matrix.target }}
 
-      - name: Install cross-compilation tools
+      - name: Install cross for complex targets
+        if: matrix.use_cross
+        run: |
+          cargo install cross
+
+      - name: Install Windows cross-compilation tools
+        if: matrix.target == 'x86_64-pc-windows-gnu'
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-mingw-w64-x86-64
-          cargo install cross
+
+      - name: Build release binary
+        working-directory: ./client/rust
+        run: |
+          if [[ "${{ matrix.use_cross }}" == "true" ]]; then
+            cross build --release --target ${{ matrix.target }}
+          else
+            cargo build --release --target ${{ matrix.target }}
+          fi
+
+      - name: Package binary
+        working-directory: ./client/rust
+        run: |
+          cd target/${{ matrix.target }}/release
+          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
+            zip ../../../mita-${{ matrix.target }}.zip mita.exe
+          else
+            tar -czf ../../../mita-${{ matrix.target }}.tar.gz mita
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mita-${{ matrix.target }}
+          path: ./client/rust/mita-${{ matrix.target }}.*
+
+  github-release:
+    name: GitHub Release
+    needs: [ build ]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Get the version
         working-directory: ./client/rust
@@ -70,18 +120,16 @@ jobs:
           VER=$(grep "^version" Cargo.toml | awk '{print $3}' | tr -d '"')
           echo "VERSION=$VER" >> $GITHUB_ENV
 
-      - name: Build release binary
-        working-directory: ./client/rust
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Prepare release files
         run: |
-          if [[ "${{ matrix.target }}" == *"windows"* ]]; then
-            cross build --release --target ${{ matrix.target }}
-            cd target/${{ matrix.target }}/release
-            zip ../../../mita-${{ matrix.target }}.zip mita.exe
-          else
-            cross build --release --target ${{ matrix.target }}
-            cd target/${{ matrix.target }}/release
-            tar -czf ../../../mita-${{ matrix.target }}.tar.gz mita
-          fi
+          mkdir -p ./release-files
+          find ./artifacts -name "mita-*" -exec cp {} ./release-files/ \;
+          ls -la ./release-files/
 
       - name: Release to GitHub Release
         uses: marvinpinto/action-automatic-releases@latest
@@ -90,12 +138,12 @@ jobs:
           automatic_release_tag: "client/rust/${{ env.VERSION }}"
           title: "[client-rust/${{ env.VERSION }}] Mita Rust Client Release"
           prerelease: false
-          files: "./client/rust/mita-${{ matrix.target }}.*"
+          files: "./release-files/*"
           draft: true
 
   crates-release:
     name: Crates.io Release
-    needs: [ github-release ]
+    needs: [ build ]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
